@@ -68,7 +68,7 @@ Lox::runPrompt()
 	while(true)
 	{
 		std::wstring line;
-		std::cout << "> ";
+		std::wcout << L"> ";
 		std::getline(std::wcin, line);
 		if (std::wcin.eof())
 		{

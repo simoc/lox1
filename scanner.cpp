@@ -34,7 +34,8 @@ Scanner::scanTokens()
 		start = current;
 		scanToken();
 	}
-	tokens.push_back(Token(END_OF_FILE, std::wstring(), nullptr, line));
+	tokens.push_back(Token(END_OF_FILE, std::wstring(),
+		std::wstring(), line));
 	return tokens;
 }
 
@@ -70,6 +71,9 @@ Scanner::scanToken()
 			break;
 		case '-':
 			addToken(MINUS);
+			break;
+		case '+':
+			addToken(PLUS);
 			break;
 		case ';':
 			addToken(SEMICOLON);
@@ -125,7 +129,7 @@ Scanner::scanToken()
 			}
 			else
 			{
-				Lox::error(line, L"Unexpected character.");
+				Lox::error(line, std::wstring(L"Unexpected character: ") + c);
 			}
 			break;
 	}
