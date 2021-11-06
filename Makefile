@@ -1,7 +1,18 @@
-lox1: main.cpp lox.cpp scanner.cpp token.cpp
-	gcc -g -std=c++11 -o $@ $^ -lstdc++
+generateast: generateast.cpp
+	gcc -g -std=c++17 -o $@ $^ -lstdc++
 
-all: lox1
+expr.h: generateast
+	./generateast .
+
+astprinter.cpp: expr.h
+
+astprinter: astprinter.cpp token.cpp
+	gcc -g -std=c++17 -o $@ $^ -lstdc++
+
+lox1: main.cpp lox.cpp scanner.cpp token.cpp
+	gcc -g -std=c++17 -o $@ $^ -lstdc++
+
+all: generateast astprinter lox1
 
 clean:
-	rm -f lox1
+	rm -f generateast astprinter lox1 expr.h
