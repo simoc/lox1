@@ -1,5 +1,7 @@
+CXXFLAGS=-Wall -g -std=c++17
+
 generateast: generateast.cpp
-	gcc -g -std=c++17 -o $@ $^ -lstdc++
+	gcc $(CXXFLAGS) -o $@ $^ -lstdc++
 
 expr.h: generateast
 	./generateast .
@@ -7,10 +9,10 @@ expr.h: generateast
 astprinter.cpp: expr.h
 
 astprinter: astprinter.cpp token.cpp
-	gcc -g -std=c++17 -o $@ $^ -lstdc++
+	gcc $(CXXFLAGS) -o $@ $^ -lstdc++
 
 lox1: main.cpp lox.cpp scanner.cpp token.cpp
-	gcc -g -std=c++17 -o $@ $^ -lstdc++
+	gcc $(CXXFLAGS) -o $@ $^ -lstdc++
 
 all: generateast astprinter lox1
 

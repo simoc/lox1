@@ -31,8 +31,8 @@ private:
 
 	std::wstring source;
 	std::vector<Token> tokens;
-	int start = 0;
-	int current = 0;
+	std::wstring::size_type start = 0;
+	std::wstring::size_type current = 0;
 	int line = 1;
 	static const std::map<std::wstring, TokenType> keywords;
 };
