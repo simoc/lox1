@@ -14,7 +14,7 @@ astprintermain: astprintermain.cpp astprinter.cpp token.cpp
 lox1: main.cpp lox.cpp scanner.cpp token.cpp
 	gcc $(CXXFLAGS) -o $@ $^ -lstdc++
 
-all: generateast astprinter lox1
+all: generateast astprintermain lox1
 
 clean:
-	rm -f generateast astprinter lox1 expr.h
+	rm -f generateast astprintermain lox1 expr.h
