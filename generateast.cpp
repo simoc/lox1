@@ -14,7 +14,14 @@ trim(const std::wstring &str)
 	{
 		return str.substr(startIndex, endIndex - startIndex + 1);
 	}
-	return str.substr(startIndex);
+	else if (startIndex != std::wstring::npos)
+	{
+		return str.substr(startIndex);
+	}
+	else
+	{
+		return str;
+	}
 }
 
 std::wstring
@@ -59,13 +66,21 @@ defineType(std::wofstream &f,
 		}
 		field = trim(field);
 
-		fields.push_back(field);
+		if (!field.empty())
+		{
+			fields.push_back(field);
+		}
 		beginIndex = endIndex + 1;
 	}
 	while (endIndex != std::wstring::npos);
 
 	// Constructor.
-	f << "\t" << className << "(" << fieldList << ") :" << std::endl;
+	f << "\t" << className << "(" << fieldList << ")";
+	if (!fields.empty())
+	{
+		f << " :";
+	}
+	f << std::endl;
 
 	for (std::wstring field : fields)
 	{
