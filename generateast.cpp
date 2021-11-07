@@ -31,7 +31,10 @@ defineType(std::wofstream &f,
 	const std::wstring &className,
 	const std::wstring &fieldList)
 {
-	f << "class " << className << " : public " << baseName << std::endl;
+	f << std::endl;
+	f << "template<class R>" << std::endl;
+	f << "class " << className << " : public " <<
+		baseName << "<R>" << std::endl;
 	f << "{" << std::endl;
 	f << "public:" << std::endl;
 
@@ -66,7 +69,7 @@ defineType(std::wofstream &f,
 
 	for (std::wstring field : fields)
 	{
-		std::wstring::size_type index = field.find(L'&');
+		std::wstring::size_type index = field.find(L'*');
 		if (index == std::wstring::npos)
 		{
 			index = field.find(L' ');
@@ -85,9 +88,9 @@ defineType(std::wofstream &f,
 	f << L"\t}" << std::endl;
 
 	// Visitor pattern.
-	f << L"\ttemplate<class R> R accept(Visitor<R> *visitor)" << std::endl;
+	f << L"\tR accept(Visitor<R> *visitor)" << std::endl;
 	f << L"\t{" << std::endl;
-	f << L"\t\treturn visitor.visit" << className << baseName <<
+	f << L"\t\treturn visitor->visit" << className << baseName <<
 		"(this);" << std::endl;
 	f << L"\t}" << std::endl;
 
@@ -95,7 +98,7 @@ defineType(std::wofstream &f,
 	f << std::endl;
 	for (std::wstring field : fields)
 	{
-		std::wstring::size_type index = field.find(L'&');
+		std::wstring::size_type index = field.find(L'*');
 		if (index == std::wstring::npos)
 		{
 			index = field.find(L' ');
@@ -122,6 +125,7 @@ defineExprClasses(
 		{
 			auto typeName = entry.substr(0, index);
 			typeName = trim(typeName);
+			f << L"template <class R>" << std::endl;
 			f << L"class " << typeName << ";" << std::endl;
 		}
 	}
@@ -148,18 +152,20 @@ defineVisitor(
 		}
 	}
 
-	f << L"\ttemplate<class R> class Visitor" << std::endl;
-	f << L"\t{" << std::endl;
+	f << std::endl;
+	f << L"template<class R>" << std::endl;
+	f << L"class Visitor" << std::endl;
+	f << L"{" << std::endl;
+	f << L"public:" << std::endl;
 
 	for (const auto &typeName : typeNames)
 	{
-		f << L"\t\tvirtual R visit" << typeName << baseName <<
-		       	"(" << typeName << " &" << lower << ") = 0;" <<
+		f << L"\tvirtual R visit" << typeName << baseName <<
+			"(" << typeName << "<R> *" << lower << ") = 0;" <<
 		       	std::endl;
 	}
 
-	f << L"\t};" << std::endl;
-	f << std::endl;
+	f << L"};" << std::endl;
 }
 
 void
@@ -180,20 +186,17 @@ defineAst(char *outputDir,
 
 	defineExprClasses(f, types);
 
+	defineVisitor(f, baseName, types);
+
 	f << std::endl;
+	f << L"template<class R>" << std::endl;
 	f << L"class " << baseName << std::endl;
 	f << L"{" << std::endl;
 	f << L"public:" << std::endl;
 
-	defineVisitor(f, baseName, types);
 
 	// The base accept() method.
-	f << std::endl;
-	f << L"\ttemplate<class R> R accept(Visitor<R> *visitor)" << std::endl;
-	f << L"\t{" << std::endl;
-	f << L"\t\treturn R();" << std::endl;
-	f << L"\t}" << std::endl;
-
+	f << L"\tvirtual R accept(Visitor<R> *visitor) = 0;" << std::endl;
 	f << L"};" << std::endl;
 
 	for (const auto &entry : types)
@@ -221,11 +224,11 @@ main(int argc, char *argv[])
 
 	const std::vector<std::wstring> types =
 	{
-		L"Binary   : Expr &left, Token &operatorX, Expr &right",
-		L"Grouping : Expr &expression",
+		L"Binary   : Expr<R> *left, Token *operatorX, Expr<R> *right",
+		L"Grouping : Expr<R> *expression",
 		L"DoubleLiteral  : double value",
-		L"StringLiteral  : std::wstring &value",
-		L"Unary    : Token &operatorX, Expr &right"
+		L"StringLiteral  : std::wstring value",
+		L"Unary    : Token *operatorX, Expr<R> *right"
 	};
 	defineAst(outputDir, L"Expr", types);
 }
