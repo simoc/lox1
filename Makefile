@@ -8,7 +8,7 @@ expr.h: generateast
 
 astprinter.cpp: expr.h
 
-astprinter: astprinter.cpp token.cpp
+astprintermain: astprintermain.cpp astprinter.cpp token.cpp
 	gcc $(CXXFLAGS) -o $@ $^ -lstdc++
 
 lox1: main.cpp lox.cpp scanner.cpp token.cpp
