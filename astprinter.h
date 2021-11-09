@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 
 #include "token.h"
 #include "expr.h"
@@ -20,8 +21,9 @@ public:
 
 	std::wstring visitUnaryExpr(Unary<std::wstring> *expr);
 
-	std::wstring parenthesize(const std::wstring &name, Expr<std::wstring> *expr1);
+	std::wstring parenthesize(const std::wstring &name, std::shared_ptr<Expr<std::wstring>> expr1);
 
 	std::wstring parenthesize(const std::wstring &name,
-		Expr<std::wstring> *expr1, Expr<std::wstring> *expr2);
+		std::shared_ptr<Expr<std::wstring>> expr1,
+		std::shared_ptr<Expr<std::wstring>> expr2);
 };

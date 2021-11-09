@@ -196,6 +196,7 @@ defineAst(char *outputDir,
 	f.open(outPath.string());
 	f << L"#pragma once" << std::endl;
 	f << std::endl;
+	f << L"#include <memory>" << std::endl;
 	f << L"#include \"token.h\"" << std::endl;
 	f << std::endl;
 
@@ -239,11 +240,11 @@ main(int argc, char *argv[])
 
 	const std::vector<std::wstring> types =
 	{
-		L"Binary   : Expr<R> *left, Token *operatorX, Expr<R> *right",
-		L"Grouping : Expr<R> *expression",
+		L"Binary   : std::shared_ptr<Expr<R>> left, std::shared_ptr<Token> operatorX, std::shared_ptr<Expr<R>> right",
+		L"Grouping : std::shared_ptr<Expr<R>> expression",
 		L"DoubleLiteral  : double value",
 		L"StringLiteral  : std::wstring value",
-		L"Unary    : Token *operatorX, Expr<R> *right"
+		L"Unary    : std::shared_ptr<Token> operatorX, std::shared_ptr<Expr<R>> right"
 	};
 	defineAst(outputDir, L"Expr", types);
 }

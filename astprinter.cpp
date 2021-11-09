@@ -46,7 +46,8 @@ AstPrinter::visitUnaryExpr(Unary<std::wstring> *expr)
 }
 
 std::wstring
-AstPrinter::parenthesize(const std::wstring &name, Expr<std::wstring> *expr1)
+AstPrinter::parenthesize(const std::wstring &name,
+	std::shared_ptr<Expr<std::wstring>> expr1)
 {
 	std::wostringstream os;
 	os << "(" << name << " " << expr1->accept(this) << ")";
@@ -55,7 +56,8 @@ AstPrinter::parenthesize(const std::wstring &name, Expr<std::wstring> *expr1)
 
 std::wstring
 AstPrinter::parenthesize(const std::wstring &name,
-	Expr<std::wstring> *expr1, Expr<std::wstring> *expr2)
+	std::shared_ptr<Expr<std::wstring>> expr1,
+	std::shared_ptr<Expr<std::wstring>> expr2)
 {
 	std::wostringstream os;
 	os << "(" << name << " " <<
