@@ -244,6 +244,8 @@ main(int argc, char *argv[])
 		L"Grouping : std::shared_ptr<Expr<R>> expression",
 		L"DoubleLiteral  : double value",
 		L"StringLiteral  : std::wstring value",
+		L"BooleanLiteral  : bool value",
+		L"NilLiteral  :",
 		L"Unary    : std::shared_ptr<Token> operatorX, std::shared_ptr<Expr<R>> right"
 	};
 	defineAst(outputDir, L"Expr", types);

@@ -19,6 +19,10 @@ public:
 
 	std::wstring visitStringLiteralExpr(StringLiteral<std::wstring> *expr);
 
+	std::wstring visitBooleanLiteralExpr(BooleanLiteral<std::wstring> *expr);
+
+	std::wstring visitNilLiteralExpr(NilLiteral<std::wstring> *expr);
+
 	std::wstring visitUnaryExpr(Unary<std::wstring> *expr);
 
 	std::wstring parenthesize(const std::wstring &name, std::shared_ptr<Expr<std::wstring>> expr1);

@@ -40,6 +40,18 @@ AstPrinter::visitStringLiteralExpr(StringLiteral<std::wstring> *expr)
 }
 
 std::wstring
+AstPrinter::visitBooleanLiteralExpr(BooleanLiteral<std::wstring> *expr)
+{
+	return expr->m_value ? L"true" : L"false";
+}
+
+std::wstring
+AstPrinter::visitNilLiteralExpr(NilLiteral<std::wstring> *expr)
+{
+	return L"nil";
+}
+
+std::wstring
 AstPrinter::visitUnaryExpr(Unary<std::wstring> *expr)
 {
 	return parenthesize(expr->m_operatorX->lexeme, expr->m_right);
