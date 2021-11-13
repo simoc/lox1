@@ -4,6 +4,9 @@
 
 #include "lox.h"
 #include "scanner.h"
+#include "parser.h"
+#include "expr.h"
+#include "astprinter.h"
 
 bool Lox::hadError = false;
 
@@ -22,14 +25,33 @@ Lox::error(int line, const std::wstring &message)
 }
 
 void
+Lox::error(Token token, const std::wstring &message)
+{
+	if (token.type == END_OF_FILE)
+	{
+		report(token.line, L" at end", message);
+	}
+	else
+	{
+		report(token.line, L" at '" + token.lexeme + L"'", message);
+	}
+}
+
+void
 Lox::run(const std::wstring &bytes)
 {
 	Scanner scanner(bytes);
 	auto tokens = scanner.scanTokens();
-	for (const auto &token : tokens)
+	Parser<std::wstring> parser(tokens);
+	std::shared_ptr<Expr<std::wstring>> expr = parser.parse();
+
+	// Stop if there was a syntax error.
+	if (hadError)
 	{
-		std::wcout << token << std::endl;
+		return;
 	}
+	AstPrinter printer;
+	std::wcout << printer.print(expr) << std::endl;
 }
 
 void

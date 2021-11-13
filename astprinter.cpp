@@ -5,7 +5,7 @@
 #include "astprinter.h"
 
 std::wstring
-AstPrinter::print(Expr<std::wstring> *expr)
+AstPrinter::print(std::shared_ptr<Expr<std::wstring>> expr)
 {
 	return expr->accept(this);
 }

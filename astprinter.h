@@ -9,7 +9,7 @@
 class AstPrinter : public Visitor<std::wstring>
 {
 public:
-	std::wstring print(Expr<std::wstring> *expr);
+	std::wstring print(std::shared_ptr<Expr<std::wstring>> expr);
 
 	std::wstring visitBinaryExpr(Binary<std::wstring> *expr);
 

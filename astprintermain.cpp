@@ -19,11 +19,11 @@ main(int argc, char *argv[])
 	auto d2 = std::make_shared<DoubleLiteral<std::wstring>>(45.67);
 	auto g = std::make_shared<Grouping<std::wstring>>(d2);
 
-	auto expression = Binary<std::wstring>(
+	auto expression = std::make_shared<Binary<std::wstring>>(
 		u1,
 		t2,
 		g);
 
 	AstPrinter printer;
-	std::wcout << printer.print(&expression) << std::endl;
+	std::wcout << printer.print(expression) << std::endl;
 }
