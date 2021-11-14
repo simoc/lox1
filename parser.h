@@ -9,7 +9,6 @@
 #include "parseerror.h"
 #include "lox.h"
 
-template <class R>
 class Parser
 {
 public:
@@ -18,7 +17,7 @@ public:
 	{
 	}
 
-	std::shared_ptr<Expr<R>> parse()
+	std::shared_ptr<Expr> parse()
 	{
 		try
 		{
@@ -26,18 +25,18 @@ public:
 		}
 		catch (const ParseError &e)
 		{
-			return std::shared_ptr<NilLiteral<R>>();
+			return std::shared_ptr<NilLiteral>();
 		}
 	}
 
-	std::shared_ptr<Expr<R>> expression()
+	std::shared_ptr<Expr> expression()
 	{
 		return equality();
 	}
 
-	std::shared_ptr<Expr<R>> equality()
+	std::shared_ptr<Expr> equality()
 	{
-		std::shared_ptr<Expr<R>> expr = comparison();
+		std::shared_ptr<Expr> expr = comparison();
 
 		const std::vector<TokenType> tokenTypes = {
 			BANG_EQUAL,
@@ -46,15 +45,15 @@ public:
 		while (match(tokenTypes))
 		{
 			std::shared_ptr<Token> op = std::make_shared<Token>(previous());
-			std::shared_ptr<Expr<R>> right = comparison();
-			expr = std::make_shared<Binary<R>>(expr, op, right);
+			std::shared_ptr<Expr> right = comparison();
+			expr = std::make_shared<Binary>(expr, op, right);
 		}
 		return expr;
 	}
 
-	std::shared_ptr<Expr<R>> comparison()
+	std::shared_ptr<Expr> comparison()
 	{
-		std::shared_ptr<Expr<R>> expr = term();
+		std::shared_ptr<Expr> expr = term();
 
 		const std::vector<TokenType> tokenTypes = {
 			GREATER,
@@ -65,15 +64,15 @@ public:
 		while (match(tokenTypes))
 		{
 			std::shared_ptr<Token> op = std::make_shared<Token>(previous());
-			std::shared_ptr<Expr<R>> right = term();
-			expr = std::make_shared<Binary<R>>(expr, op, right);
+			std::shared_ptr<Expr> right = term();
+			expr = std::make_shared<Binary>(expr, op, right);
 		}
 		return expr;
 	}
 
-	std::shared_ptr<Expr<R>> term()
+	std::shared_ptr<Expr> term()
 	{
-		std::shared_ptr<Expr<R>> expr = factor();
+		std::shared_ptr<Expr> expr = factor();
 
 		const std::vector<TokenType> tokenTypes = {
 			MINUS,
@@ -82,15 +81,15 @@ public:
 		while (match(tokenTypes))
 		{
 			std::shared_ptr<Token> op = std::make_shared<Token>(previous());
-			std::shared_ptr<Expr<R>> right = factor();
-			expr = std::make_shared<Binary<R>>(expr, op, right);
+			std::shared_ptr<Expr> right = factor();
+			expr = std::make_shared<Binary>(expr, op, right);
 		}
 		return expr;
 	}
 
-	std::shared_ptr<Expr<R>> factor()
+	std::shared_ptr<Expr> factor()
 	{
-		std::shared_ptr<Expr<R>> expr = unary();
+		std::shared_ptr<Expr> expr = unary();
 
 		const std::vector<TokenType> tokenTypes = {
 			SLASH,
@@ -99,13 +98,13 @@ public:
 		while (match(tokenTypes))
 		{
 			std::shared_ptr<Token> op = std::make_shared<Token>(previous());
-			std::shared_ptr<Expr<R>> right = unary();
-			expr = std::make_shared<Binary<R>>(expr, op, right);
+			std::shared_ptr<Expr> right = unary();
+			expr = std::make_shared<Binary>(expr, op, right);
 		}
 		return expr;
 	}
 
-	std::shared_ptr<Expr<R>> unary()
+	std::shared_ptr<Expr> unary()
 	{
 		const std::vector<TokenType> tokenTypes = {
 			BANG,
@@ -114,26 +113,26 @@ public:
 		if (match(tokenTypes))
 		{
 			std::shared_ptr<Token> op = std::make_shared<Token>(previous());
-			std::shared_ptr<Expr<R>> right = unary();
-			return std::make_shared<Unary<R>>(op, right);
+			std::shared_ptr<Expr> right = unary();
+			return std::make_shared<Unary>(op, right);
 		}
 
 		return primary();
 	}
 
-	std::shared_ptr<Expr<R>> primary()
+	std::shared_ptr<Expr> primary()
 	{
 		if (match(FALSE))
 		{
-			return std::make_shared<BooleanLiteral<R>>(false);
+			return std::make_shared<BooleanLiteral>(false);
 		}
 		if (match(TRUE))
 		{
-			return std::make_shared<BooleanLiteral<R>>(true);
+			return std::make_shared<BooleanLiteral>(true);
 		}
 		if (match(NIL))
 		{
-			return std::make_shared<NilLiteral<R>>();
+			return std::make_shared<NilLiteral>();
 		}
 
 		const std::vector<TokenType> tokenTypes = {
@@ -142,14 +141,14 @@ public:
 		};
 		if (match(tokenTypes))
 		{
-			return std::make_shared<StringLiteral<R>>(previous().string_literal);
+			return std::make_shared<StringLiteral>(previous().string_literal);
 		}
 
 		if (match(LEFT_PAREN))
 		{
-			std::shared_ptr<Expr<R>> expr = expression();
+			std::shared_ptr<Expr> expr = expression();
 			consume(RIGHT_PAREN, L"Expect ')' after expression.");
-			return std::make_shared<Grouping<R>>(expr);
+			return std::make_shared<Grouping>(expr);
 		}
 
 		throw error(peek(), L"Expect expression.");
@@ -193,6 +192,8 @@ public:
 			case PRINT:
 			case RETURN:
 				return;
+			default:
+				break;
 			}
 
 			advance();

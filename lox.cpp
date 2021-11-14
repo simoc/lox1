@@ -42,8 +42,8 @@ Lox::run(const std::wstring &bytes)
 {
 	Scanner scanner(bytes);
 	auto tokens = scanner.scanTokens();
-	Parser<std::wstring> parser(tokens);
-	std::shared_ptr<Expr<std::wstring>> expr = parser.parse();
+	Parser parser(tokens);
+	std::shared_ptr<Expr> expr = parser.parse();
 
 	// Stop if there was a syntax error.
 	if (hadError)

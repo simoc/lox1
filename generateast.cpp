@@ -39,9 +39,8 @@ defineType(std::wofstream &f,
 	const std::wstring &fieldList)
 {
 	f << std::endl;
-	f << "template<class R>" << std::endl;
 	f << "class " << className << " : public " <<
-		baseName << "<R>" << std::endl;
+		baseName << std::endl;
 	f << "{" << std::endl;
 	f << "public:" << std::endl;
 
@@ -103,7 +102,7 @@ defineType(std::wofstream &f,
 	f << L"\t}" << std::endl;
 
 	// Visitor pattern.
-	f << L"\tR accept(Visitor<R> *visitor)" << std::endl;
+	f << L"\tstd::any accept(Visitor *visitor)" << std::endl;
 	f << L"\t{" << std::endl;
 	f << L"\t\treturn visitor->visit" << className << baseName <<
 		"(this);" << std::endl;
@@ -140,7 +139,6 @@ defineExprClasses(
 		{
 			auto typeName = entry.substr(0, index);
 			typeName = trim(typeName);
-			f << L"template <class R>" << std::endl;
 			f << L"class " << typeName << ";" << std::endl;
 		}
 	}
@@ -168,15 +166,14 @@ defineVisitor(
 	}
 
 	f << std::endl;
-	f << L"template<class R>" << std::endl;
 	f << L"class Visitor" << std::endl;
 	f << L"{" << std::endl;
 	f << L"public:" << std::endl;
 
 	for (const auto &typeName : typeNames)
 	{
-		f << L"\tvirtual R visit" << typeName << baseName <<
-			"(" << typeName << "<R> *" << lower << ") = 0;" <<
+		f << L"\tvirtual std::any visit" << typeName << baseName <<
+			"(" << typeName << " *" << lower << ") = 0;" <<
 		       	std::endl;
 	}
 
@@ -197,6 +194,7 @@ defineAst(char *outputDir,
 	f << L"#pragma once" << std::endl;
 	f << std::endl;
 	f << L"#include <memory>" << std::endl;
+	f << L"#include <any>" << std::endl;
 	f << L"#include \"token.h\"" << std::endl;
 	f << std::endl;
 
@@ -205,14 +203,13 @@ defineAst(char *outputDir,
 	defineVisitor(f, baseName, types);
 
 	f << std::endl;
-	f << L"template<class R>" << std::endl;
 	f << L"class " << baseName << std::endl;
 	f << L"{" << std::endl;
 	f << L"public:" << std::endl;
 
 
 	// The base accept() method.
-	f << L"\tvirtual R accept(Visitor<R> *visitor) = 0;" << std::endl;
+	f << L"\tvirtual std::any accept(Visitor *visitor) = 0;" << std::endl;
 	f << L"};" << std::endl;
 
 	for (const auto &entry : types)
@@ -240,13 +237,13 @@ main(int argc, char *argv[])
 
 	const std::vector<std::wstring> types =
 	{
-		L"Binary   : std::shared_ptr<Expr<R>> left, std::shared_ptr<Token> operatorX, std::shared_ptr<Expr<R>> right",
-		L"Grouping : std::shared_ptr<Expr<R>> expression",
+		L"Binary   : std::shared_ptr<Expr> left, std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
+		L"Grouping : std::shared_ptr<Expr> expression",
 		L"DoubleLiteral  : double value",
 		L"StringLiteral  : std::wstring value",
 		L"BooleanLiteral  : bool value",
 		L"NilLiteral  :",
-		L"Unary    : std::shared_ptr<Token> operatorX, std::shared_ptr<Expr<R>> right"
+		L"Unary    : std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right"
 	};
 	defineAst(outputDir, L"Expr", types);
 }

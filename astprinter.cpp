@@ -5,75 +5,79 @@
 #include "astprinter.h"
 
 std::wstring
-AstPrinter::print(std::shared_ptr<Expr<std::wstring>> expr)
+AstPrinter::print(std::shared_ptr<Expr> expr)
 {
-	return expr->accept(this);
+	std::any result = expr->accept(this);
+	return std::any_cast<std::wstring>(result);
 }
 
-std::wstring
-AstPrinter::visitBinaryExpr(Binary<std::wstring> *expr)
+std::any
+AstPrinter::visitBinaryExpr(Binary *expr)
 {
 	return parenthesize(expr->m_operatorX->lexeme,
 		expr->m_left,
 		expr->m_right);
 }
 
-std::wstring
-AstPrinter::visitGroupingExpr(Grouping<std::wstring> *expr)
+std::any
+AstPrinter::visitGroupingExpr(Grouping *expr)
 {
 	std::wstring grouping(L"group");
 	return parenthesize(grouping, expr->m_expression);
 }
 
-std::wstring
-AstPrinter::visitDoubleLiteralExpr(DoubleLiteral<std::wstring> *expr)
+std::any
+AstPrinter::visitDoubleLiteralExpr(DoubleLiteral *expr)
 {
 	std::wostringstream os;
 	os << expr->m_value;
 	return os.str();
 }
 
-std::wstring
-AstPrinter::visitStringLiteralExpr(StringLiteral<std::wstring> *expr)
+std::any
+AstPrinter::visitStringLiteralExpr(StringLiteral *expr)
 {
 	return expr->m_value;
 }
 
-std::wstring
-AstPrinter::visitBooleanLiteralExpr(BooleanLiteral<std::wstring> *expr)
+std::any
+AstPrinter::visitBooleanLiteralExpr(BooleanLiteral *expr)
 {
-	return expr->m_value ? L"true" : L"false";
+	return expr->m_value ? std::wstring(L"true") : std::wstring(L"false");
 }
 
-std::wstring
-AstPrinter::visitNilLiteralExpr(NilLiteral<std::wstring> *expr)
+std::any
+AstPrinter::visitNilLiteralExpr(NilLiteral *expr)
 {
-	return L"nil";
+	return std::wstring(L"nil");
 }
 
-std::wstring
-AstPrinter::visitUnaryExpr(Unary<std::wstring> *expr)
+std::any
+AstPrinter::visitUnaryExpr(Unary *expr)
 {
 	return parenthesize(expr->m_operatorX->lexeme, expr->m_right);
 }
 
-std::wstring
+std::any
 AstPrinter::parenthesize(const std::wstring &name,
-	std::shared_ptr<Expr<std::wstring>> expr1)
+	std::shared_ptr<Expr> expr1)
 {
 	std::wostringstream os;
-	os << "(" << name << " " << expr1->accept(this) << ")";
+	std::any result = expr1->accept(this);
+	os << "(" << name << " " << std::any_cast<std::wstring>(result) << ")";
 	return os.str();
 }
 
-std::wstring
+std::any
 AstPrinter::parenthesize(const std::wstring &name,
-	std::shared_ptr<Expr<std::wstring>> expr1,
-	std::shared_ptr<Expr<std::wstring>> expr2)
+	std::shared_ptr<Expr> expr1,
+	std::shared_ptr<Expr> expr2)
 {
 	std::wostringstream os;
+	std::any result1 = expr1->accept(this);
+	std::any result2 = expr2->accept(this);
 	os << "(" << name << " " <<
-		expr1->accept(this) << " " <<
-		expr2->accept(this) << ")";
+		std::any_cast<std::wstring>(result1) << " " <<
+		std::any_cast<std::wstring>(result2) << ")";
 	return os.str();
 }
