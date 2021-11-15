@@ -132,13 +132,13 @@ Parser::primary()
 		return std::make_shared<NilLiteral>();
 	}
 
-	const std::vector<TokenType> tokenTypes = {
-		NUMBER,
-		STRING
-	};
-	if (match(tokenTypes))
+	if (match(STRING))
 	{
 		return std::make_shared<StringLiteral>(previous().string_literal);
+	}
+	if (match(NUMBER))
+	{
+		return std::make_shared<DoubleLiteral>(previous().double_literal);
 	}
 
 	if (match(LEFT_PAREN))
