@@ -12,7 +12,7 @@ AstPrinter::print(std::shared_ptr<Expr> expr)
 }
 
 std::any
-AstPrinter::visitBinaryExpr(Binary *expr)
+AstPrinter::visitBinaryExpr(std::shared_ptr<Binary> expr)
 {
 	return parenthesize(expr->m_operatorX->lexeme,
 		expr->m_left,
@@ -20,14 +20,14 @@ AstPrinter::visitBinaryExpr(Binary *expr)
 }
 
 std::any
-AstPrinter::visitGroupingExpr(Grouping *expr)
+AstPrinter::visitGroupingExpr(std::shared_ptr<Grouping> expr)
 {
 	std::wstring grouping(L"group");
 	return parenthesize(grouping, expr->m_expression);
 }
 
 std::any
-AstPrinter::visitDoubleLiteralExpr(DoubleLiteral *expr)
+AstPrinter::visitDoubleLiteralExpr(std::shared_ptr<DoubleLiteral> expr)
 {
 	std::wostringstream os;
 	os << expr->m_value;
@@ -35,25 +35,25 @@ AstPrinter::visitDoubleLiteralExpr(DoubleLiteral *expr)
 }
 
 std::any
-AstPrinter::visitStringLiteralExpr(StringLiteral *expr)
+AstPrinter::visitStringLiteralExpr(std::shared_ptr<StringLiteral> expr)
 {
 	return expr->m_value;
 }
 
 std::any
-AstPrinter::visitBooleanLiteralExpr(BooleanLiteral *expr)
+AstPrinter::visitBooleanLiteralExpr(std::shared_ptr<BooleanLiteral> expr)
 {
 	return expr->m_value ? std::wstring(L"true") : std::wstring(L"false");
 }
 
 std::any
-AstPrinter::visitNilLiteralExpr(NilLiteral *expr)
+AstPrinter::visitNilLiteralExpr(std::shared_ptr<NilLiteral> expr)
 {
 	return std::wstring(L"nil");
 }
 
 std::any
-AstPrinter::visitUnaryExpr(Unary *expr)
+AstPrinter::visitUnaryExpr(std::shared_ptr<Unary> expr)
 {
 	return parenthesize(expr->m_operatorX->lexeme, expr->m_right);
 }

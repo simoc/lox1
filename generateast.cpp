@@ -40,7 +40,8 @@ defineType(std::wofstream &f,
 {
 	f << std::endl;
 	f << "class " << className << " : public " <<
-		baseName << std::endl;
+		baseName << ", public std::enable_shared_from_this<" <<
+		className << ">" << std::endl;
 	f << "{" << std::endl;
 	f << "public:" << std::endl;
 
@@ -105,7 +106,7 @@ defineType(std::wofstream &f,
 	f << L"\tstd::any accept(Visitor *visitor)" << std::endl;
 	f << L"\t{" << std::endl;
 	f << L"\t\treturn visitor->visit" << className << baseName <<
-		"(this);" << std::endl;
+		"(shared_from_this());" << std::endl;
 	f << L"\t}" << std::endl;
 
 	// Fields.
@@ -173,7 +174,7 @@ defineVisitor(
 	for (const auto &typeName : typeNames)
 	{
 		f << L"\tvirtual std::any visit" << typeName << baseName <<
-			"(" << typeName << " *" << lower << ") = 0;" <<
+			"(std::shared_ptr<" << typeName << "> " << lower << ") = 0;" <<
 		       	std::endl;
 	}
 
