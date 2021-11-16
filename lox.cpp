@@ -6,9 +6,10 @@
 #include "scanner.h"
 #include "parser.h"
 #include "expr.h"
-#include "astprinter.h"
 
 bool Lox::hadError = false;
+bool Lox::hadRuntimeError = false;
+Interpreter Lox::interpreter;
 
 void
 Lox::report(int line, const std::wstring &where, const std::wstring &message)
@@ -38,6 +39,14 @@ Lox::error(Token token, const std::wstring &message)
 }
 
 void
+Lox::runtimeError(const RuntimeError &error)
+{
+	std::wcerr << error.what() << std::endl;
+	std::wcerr << "[line " << error.token->line << "]" << std::endl;
+	hadRuntimeError = true;
+}
+
+void
 Lox::run(const std::wstring &bytes)
 {
 	Scanner scanner(bytes);
@@ -50,8 +59,7 @@ Lox::run(const std::wstring &bytes)
 	{
 		return;
 	}
-	AstPrinter printer;
-	std::wcout << printer.print(expr) << std::endl;
+	interpreter.interpret(expr);
 }
 
 void
@@ -80,6 +88,10 @@ Lox::runFile(char *path)
 		if (hadError)
 		{
 			exit(65);
+		}
+		if (hadRuntimeError)
+		{
+			exit(70);
 		}
 	}
 }
