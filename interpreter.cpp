@@ -132,6 +132,21 @@ Interpreter::visitUnaryExpr(std::shared_ptr<Unary> expr)
 	return std::make_shared<NilLiteral>();
 }
 
+std::any
+Interpreter::visitPrintStmt(std::shared_ptr<Print> stmt)
+{
+	std::any value = evaluate(stmt->m_expression);
+	std::wcout << stringify(value) << std::endl;
+	return value;
+}
+
+std::any
+Interpreter::visitExpressionStmt(std::shared_ptr<Expression> stmt)
+{
+	std::any value = evaluate(stmt->m_expression);
+	return value;
+}
+
 void
 Interpreter::checkNumberOperand(std::shared_ptr<Token> operatorX, std::any operand)
 {
@@ -278,15 +293,23 @@ Interpreter::stringify(std::any n)
 }
 
 void
-Interpreter::interpret(std::shared_ptr<Expr> expr)
+Interpreter::interpret(std::vector<std::shared_ptr<Stmt>> statements)
 {
 	try
 	{
-		std::any value = evaluate(expr);
-		std::wcout << stringify(value) << std::endl;
+		for (std::shared_ptr<Stmt> statement :  statements)
+		{
+			execute(statement);
+		}
 	}
 	catch (const RuntimeError &e)
 	{
 		Lox::runtimeError(e);
 	}
+}
+
+void
+Interpreter::execute(std::shared_ptr<Stmt> stmt)
+{
+	stmt->accept(this);
 }

@@ -6,6 +6,9 @@ generateast: generateast.cpp
 expr.h: generateast
 	./generateast .
 
+stmt.h: generateast
+	./generateast .
+
 astprinter.cpp: expr.h
 
 astprintermain: astprintermain.cpp astprinter.cpp token.cpp
@@ -17,4 +20,4 @@ lox1: main.cpp lox.cpp scanner.cpp token.cpp parser.cpp interpreter.cpp
 all: generateast astprintermain lox1
 
 clean:
-	rm -f generateast astprintermain lox1 expr.h
+	rm -f generateast astprintermain lox1 expr.h stmt.h

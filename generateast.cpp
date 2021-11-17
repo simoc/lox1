@@ -103,7 +103,7 @@ defineType(std::wofstream &f,
 	f << L"\t}" << std::endl;
 
 	// Visitor pattern.
-	f << L"\tstd::any accept(Visitor *visitor)" << std::endl;
+	f << L"\tstd::any accept(" << baseName << "Visitor *visitor)" << std::endl;
 	f << L"\t{" << std::endl;
 	f << L"\t\treturn visitor->visit" << className << baseName <<
 		"(shared_from_this());" << std::endl;
@@ -167,7 +167,7 @@ defineVisitor(
 	}
 
 	f << std::endl;
-	f << L"class Visitor" << std::endl;
+	f << L"class " << baseName << "Visitor" << std::endl;
 	f << L"{" << std::endl;
 	f << L"public:" << std::endl;
 
@@ -210,7 +210,7 @@ defineAst(char *outputDir,
 
 
 	// The base accept() method.
-	f << L"\tvirtual std::any accept(Visitor *visitor) = 0;" << std::endl;
+	f << L"\tvirtual std::any accept(" << baseName << "Visitor *visitor) = 0;" << std::endl;
 	f << L"};" << std::endl;
 
 	for (const auto &entry : types)
@@ -247,4 +247,11 @@ main(int argc, char *argv[])
 		L"Unary    : std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right"
 	};
 	defineAst(outputDir, L"Expr", types);
+
+	const std::vector<std::wstring> statementTypes =
+	{
+		L"Expression : std::shared_ptr<Expr> expression",
+		L"Print      : std::shared_ptr<Expr> expression"
+	};
+	defineAst(outputDir, L"Stmt", statementTypes);
 }

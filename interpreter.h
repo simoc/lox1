@@ -2,11 +2,13 @@
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include "token.h"
 #include "expr.h"
+#include "stmt.h"
 
-class Interpreter : public Visitor
+class Interpreter : public ExprVisitor, public StmtVisitor
 {
 public:
 	std::any visitBinaryExpr(std::shared_ptr<Binary> expr);
@@ -23,7 +25,11 @@ public:
 
 	std::any visitUnaryExpr(std::shared_ptr<Unary> expr);
 
-	void interpret(std::shared_ptr<Expr> expr);
+	std::any visitPrintStmt(std::shared_ptr<Print> expr);
+
+	std::any visitExpressionStmt(std::shared_ptr<Expression> expr);
+
+	void interpret(std::vector<std::shared_ptr<Stmt>> statements);
 
 private:
 	std::any evaluate(std::shared_ptr<Expr> expr);
@@ -37,4 +43,6 @@ private:
 	void checkNumberOperands(std::shared_ptr<Token> operatorX, std::any left, std::any right);
 
 	bool isTruthy(std::any n);
+
+	void execute(std::shared_ptr<Stmt> stmt);
 };

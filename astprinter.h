@@ -6,7 +6,7 @@
 #include "token.h"
 #include "expr.h"
 
-class AstPrinter : public Visitor
+class AstPrinter : public ExprVisitor
 {
 public:
 	std::wstring print(std::shared_ptr<Expr> expr);

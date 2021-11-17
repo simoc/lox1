@@ -52,14 +52,14 @@ Lox::run(const std::wstring &bytes)
 	Scanner scanner(bytes);
 	auto tokens = scanner.scanTokens();
 	Parser parser(tokens);
-	std::shared_ptr<Expr> expr = parser.parse();
+	std::vector<std::shared_ptr<Stmt>> statements = parser.parse();
 
 	// Stop if there was a syntax error.
 	if (hadError)
 	{
 		return;
 	}
-	interpreter.interpret(expr);
+	interpreter.interpret(statements);
 }
 
 void

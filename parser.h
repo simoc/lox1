@@ -7,13 +7,14 @@
 #include "tokentype.h"
 #include "expr.h"
 #include "parseerror.h"
+#include "stmt.h"
 
 class Parser
 {
 public:
 	Parser(const std::vector<Token> &parserTokens);
 
-	std::shared_ptr<Expr> parse();
+	std::vector<std::shared_ptr<Stmt>> parse();
 
 	std::shared_ptr<Expr> expression();
 
@@ -38,6 +39,12 @@ public:
 private:
 	std::vector<Token> tokens;
 	std::wstring::size_type current = 0;
+
+	std::shared_ptr<Stmt> statement();
+
+	std::shared_ptr<Stmt> printStatement();
+
+	std::shared_ptr<Stmt> expressionStatement();
 
 	bool match(const std::vector<TokenType> &tokenTypes);
 

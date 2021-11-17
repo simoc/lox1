@@ -6,23 +6,47 @@ Parser::Parser(const std::vector<Token> &parserTokens) :
 {
 }
 
-std::shared_ptr<Expr>
+std::vector<std::shared_ptr<Stmt>>
 Parser::parse()
 {
-	try
+	std::vector<std::shared_ptr<Stmt>> statements;
+	while (!isAtEnd())
 	{
-		return expression();
+		statements.push_back(statement());
 	}
-	catch (const ParseError &e)
+	return statements;
+}
+
+std::shared_ptr<Stmt>
+Parser::statement()
+{
+	if (match(PRINT))
 	{
-		return std::shared_ptr<NilLiteral>();
+		return printStatement();
 	}
+	return expressionStatement();
+}
+
+std::shared_ptr<Stmt>
+Parser::printStatement()
+{
+	std::shared_ptr<Expr> value = expression();
+	consume(SEMICOLON, L"Expect ';' after value.");
+	return std::make_shared<Print>(value);
+}
+
+std::shared_ptr<Stmt>
+Parser::expressionStatement()
+{
+	std::shared_ptr<Expr> value = expression();
+	consume(SEMICOLON, L"Expect ';' after expression.");
+	return std::make_shared<Expression>(value);
 }
 
 std::shared_ptr<Expr>
 Parser::expression()
 {
-		return equality();
+	return equality();
 }
 
 std::shared_ptr<Expr>
