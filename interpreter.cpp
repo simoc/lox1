@@ -33,6 +33,15 @@ Interpreter::visitBinaryExpr(std::shared_ptr<Binary> expr)
 	}
 	else
 	{
+		if (expr->m_operatorX->type == BANG_EQUAL)
+		{
+			return std::make_shared<BooleanLiteral>(!isEqual(left, right));
+		}
+		else if (expr->m_operatorX->type == EQUAL_EQUAL)
+		{
+			return std::make_shared<BooleanLiteral>(isEqual(left, right));
+		}
+
 		checkNumberOperands(expr->m_operatorX, left, right);
 
 		auto leftDouble = std::any_cast<std::shared_ptr<DoubleLiteral>>(left);
@@ -65,14 +74,6 @@ Interpreter::visitBinaryExpr(std::shared_ptr<Binary> expr)
 		else if (expr->m_operatorX->type == LESS_EQUAL)
 		{
 			return std::make_shared<BooleanLiteral>(leftDouble->m_value <= rightDouble->m_value);
-		}
-		else if (expr->m_operatorX->type == BANG_EQUAL)
-		{
-			return std::make_shared<BooleanLiteral>(!isEqual(leftDouble, rightDouble));
-		}
-		else if (expr->m_operatorX->type == EQUAL_EQUAL)
-		{
-			return std::make_shared<BooleanLiteral>(isEqual(leftDouble, rightDouble));
 		}
 	}
 
@@ -234,13 +235,17 @@ Interpreter::isEqual(std::any a, std::any b)
 			}
 			catch (const std::bad_any_cast &e)
 			{
-				std::shared_ptr<BooleanLiteral> ba = std::any_cast<std::shared_ptr<BooleanLiteral>>(a);
-				std::shared_ptr<BooleanLiteral> bb = std::any_cast<std::shared_ptr<BooleanLiteral>>(b);
-				return (ba->m_value == bb->m_value);
+				try
+				{
+					std::shared_ptr<BooleanLiteral> ba = std::any_cast<std::shared_ptr<BooleanLiteral>>(a);
+					std::shared_ptr<BooleanLiteral> bb = std::any_cast<std::shared_ptr<BooleanLiteral>>(b);
+					return (ba->m_value == bb->m_value);
+				}
+				catch (const std::bad_any_cast &e)
+				{
+				}
 			}
 		}
-
-		std::any_cast<std::shared_ptr<NilLiteral>>(a);
 	}
 	return false;
 }

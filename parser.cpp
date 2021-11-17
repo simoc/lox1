@@ -10,9 +10,15 @@ std::vector<std::shared_ptr<Stmt>>
 Parser::parse()
 {
 	std::vector<std::shared_ptr<Stmt>> statements;
-	while (!isAtEnd())
+	try
 	{
-		statements.push_back(statement());
+		while (!isAtEnd())
+		{
+			statements.push_back(statement());
+		}
+	}
+	catch (const ParseError &)
+	{
 	}
 	return statements;
 }
