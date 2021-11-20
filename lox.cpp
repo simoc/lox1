@@ -26,15 +26,15 @@ Lox::error(int line, const std::wstring &message)
 }
 
 void
-Lox::error(Token token, const std::wstring &message)
+Lox::error(std::shared_ptr<Token> token, const std::wstring &message)
 {
-	if (token.type == END_OF_FILE)
+	if (token->type == END_OF_FILE)
 	{
-		report(token.line, L" at end", message);
+		report(token->line, L" at end", message);
 	}
 	else
 	{
-		report(token.line, L" at '" + token.lexeme + L"'", message);
+		report(token->line, L" at '" + token->lexeme + L"'", message);
 	}
 }
 

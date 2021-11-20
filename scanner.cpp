@@ -26,7 +26,7 @@ Scanner::Scanner(const std::wstring &bytes) :
 {
 }
 
-std::vector<Token>
+std::vector<std::shared_ptr<Token>>
 Scanner::scanTokens()
 {
 	while (!isAtEnd())
@@ -34,7 +34,7 @@ Scanner::scanTokens()
 		start = current;
 		scanToken();
 	}
-	tokens.push_back(Token(END_OF_FILE, std::wstring(),
+	tokens.push_back(std::make_shared<Token>(END_OF_FILE, std::wstring(),
 		std::wstring(), line));
 	return tokens;
 }
@@ -264,20 +264,20 @@ void
 Scanner::addToken(TokenType type)
 {
 	std::wstring text = source.substr(start, current - start);
-	tokens.push_back(Token(type, text, line));
+	tokens.push_back(std::make_shared<Token>(type, text, line));
 }
 
 void
 Scanner::addToken(TokenType type, double literal)
 {
 	std::wstring text = source.substr(start, current- start);
-	tokens.push_back(Token(type, text, literal, line));
+	tokens.push_back(std::make_shared<Token>(type, text, literal, line));
 }
 
 void
 Scanner::addToken(TokenType type, const std::wstring &literal)
 {
 	std::wstring text = source.substr(start, current - start);
-	tokens.push_back(Token(type, text, literal, line));
+	tokens.push_back(std::make_shared<Token>(type, text, literal, line));
 }
 

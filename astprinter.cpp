@@ -12,6 +12,14 @@ AstPrinter::print(std::shared_ptr<Expr> expr)
 }
 
 std::any
+AstPrinter::visitAssignExpr(std::shared_ptr<Assign> expr)
+{
+	std::wostringstream os;
+	os << "assign " << expr->m_name->lexeme;
+	return parenthesize(os.str(), expr->m_value);
+}
+
+std::any
 AstPrinter::visitBinaryExpr(std::shared_ptr<Binary> expr)
 {
 	return parenthesize(expr->m_operatorX->lexeme,
@@ -56,6 +64,12 @@ std::any
 AstPrinter::visitUnaryExpr(std::shared_ptr<Unary> expr)
 {
 	return parenthesize(expr->m_operatorX->lexeme, expr->m_right);
+}
+
+std::any
+AstPrinter::visitVariableExpr(std::shared_ptr<Variable> expr)
+{
+	return expr->m_name->lexeme;
 }
 
 std::any

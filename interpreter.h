@@ -7,10 +7,17 @@
 #include "token.h"
 #include "expr.h"
 #include "stmt.h"
+#include "environment.h"
 
 class Interpreter : public ExprVisitor, public StmtVisitor
 {
 public:
+	Interpreter();
+
+	std::any visitAssignExpr(std::shared_ptr<Assign> expr);
+
+	std::any visitBlockStmt(std::shared_ptr<Block> stmt);
+
 	std::any visitBinaryExpr(std::shared_ptr<Binary> expr);
 
 	std::any visitGroupingExpr(std::shared_ptr<Grouping> expr);
@@ -25,13 +32,21 @@ public:
 
 	std::any visitUnaryExpr(std::shared_ptr<Unary> expr);
 
+	std::any visitVariableExpr(std::shared_ptr<Variable> expr);
+
 	std::any visitPrintStmt(std::shared_ptr<Print> expr);
 
 	std::any visitExpressionStmt(std::shared_ptr<Expression> expr);
 
+	std::any visitVarStmt(std::shared_ptr<Var> expr);
+
 	void interpret(std::vector<std::shared_ptr<Stmt>> statements);
 
 private:
+	std::shared_ptr<Environment> environment;
+
+	void executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::shared_ptr<Environment> env);
+
 	std::any evaluate(std::shared_ptr<Expr> expr);
 
 	std::wstring stringify(std::any n);

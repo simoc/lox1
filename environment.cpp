@@ -31,7 +31,7 @@ Environment::get(std::shared_ptr<Token> name)
 		return enclosing->get(name);
 	}
 
-	throw RuntimeError(name, L"Undefine variable '" + name->lexeme + L"'.");
+	throw RuntimeError(name, L"Undefined variable '" + name->lexeme + L"'.");
 }
 
 void

@@ -12,11 +12,13 @@
 class Parser
 {
 public:
-	Parser(const std::vector<Token> &parserTokens);
+	Parser(const std::vector<std::shared_ptr<Token>> &parserTokens);
 
 	std::vector<std::shared_ptr<Stmt>> parse();
 
 	std::shared_ptr<Expr> expression();
+
+	std::shared_ptr<Expr> assignment();
 
 	std::shared_ptr<Expr> equality();
 
@@ -30,15 +32,19 @@ public:
 
 	std::shared_ptr<Expr> primary();
 
-	Token consume(TokenType tokenType, const std::wstring &message);
+	std::shared_ptr<Token> consume(TokenType tokenType, const std::wstring &message);
 
-	ParseError error(Token token, const std::wstring &message);
+	ParseError error(std::shared_ptr<Token> token, const std::wstring &message);
 
 	void synchronize();
 
 private:
-	std::vector<Token> tokens;
+	std::vector<std::shared_ptr<Token>> tokens;
 	std::wstring::size_type current = 0;
+
+	std::shared_ptr<Stmt> declaration();
+
+	std::shared_ptr<Stmt> varDeclaration();
 
 	std::shared_ptr<Stmt> statement();
 
@@ -46,17 +52,19 @@ private:
 
 	std::shared_ptr<Stmt> expressionStatement();
 
+	std::vector<std::shared_ptr<Stmt>> block();
+
 	bool match(const std::vector<TokenType> &tokenTypes);
 
 	bool match(TokenType tokenType);
 
 	bool check(TokenType tokenType);
 
-	Token advance();
+	std::shared_ptr<Token> advance();
 
 	bool isAtEnd();
 
-	Token peek();
+	std::shared_ptr<Token> peek();
 
-	Token previous();
+	std::shared_ptr<Token> previous();
 };

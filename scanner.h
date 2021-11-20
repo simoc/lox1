@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <memory>
 
 #include "token.h"
 
@@ -11,7 +12,7 @@ class Scanner
 public:
 	Scanner(const std::wstring &bytes);
 
-	std::vector<Token> scanTokens();
+	std::vector<std::shared_ptr<Token>> scanTokens();
 private:
 	bool isAtEnd() const;
 	void scanToken();
@@ -30,7 +31,7 @@ private:
 	void addToken(TokenType type, const std::wstring &literal);
 
 	std::wstring source;
-	std::vector<Token> tokens;
+	std::vector<std::shared_ptr<Token>> tokens;
 	std::wstring::size_type start = 0;
 	std::wstring::size_type current = 0;
 	int line = 1;

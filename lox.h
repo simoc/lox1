@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "token.h"
 #include "interpreter.h"
 #include "runtimeerror.h"
@@ -13,7 +15,7 @@ public:
 
 	static void error(int line, const std::wstring &message);
 
-	static void error(Token token, const std::wstring &message);
+	static void error(std::shared_ptr<Token> token, const std::wstring &message);
 
 	static void runtimeError(const RuntimeError &error);
 private:

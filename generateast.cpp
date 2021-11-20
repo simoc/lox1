@@ -238,20 +238,24 @@ main(int argc, char *argv[])
 
 	const std::vector<std::wstring> types =
 	{
+		L"Assign   : std::shared_ptr<Token> name, std::shared_ptr<Expr> value",
 		L"Binary   : std::shared_ptr<Expr> left, std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
 		L"Grouping : std::shared_ptr<Expr> expression",
 		L"DoubleLiteral  : double value",
 		L"StringLiteral  : std::wstring value",
 		L"BooleanLiteral  : bool value",
 		L"NilLiteral  :",
-		L"Unary    : std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right"
+		L"Unary    : std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
+		L"Variable : std::shared_ptr<Token> name"
 	};
 	defineAst(outputDir, L"Expr", types);
 
 	const std::vector<std::wstring> statementTypes =
 	{
+		L"Block      : std::vector<std::shared_ptr<Stmt>> statements",
 		L"Expression : std::shared_ptr<Expr> expression",
-		L"Print      : std::shared_ptr<Expr> expression"
+		L"Print      : std::shared_ptr<Expr> expression",
+		L"Var        : std::shared_ptr<Token> name, std::shared_ptr<Expr> initializer"
 	};
 	defineAst(outputDir, L"Stmt", statementTypes);
 }

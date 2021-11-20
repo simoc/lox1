@@ -1,7 +1,7 @@
 #include "parser.h"
 #include "lox.h"
 
-Parser::Parser(const std::vector<Token> &parserTokens) :
+Parser::Parser(const std::vector<std::shared_ptr<Token>> &parserTokens) :
 	tokens(parserTokens)
 {
 }
@@ -14,7 +14,7 @@ Parser::parse()
 	{
 		while (!isAtEnd())
 		{
-			statements.push_back(statement());
+			statements.push_back(declaration());
 		}
 	}
 	catch (const ParseError &)
@@ -24,11 +24,48 @@ Parser::parse()
 }
 
 std::shared_ptr<Stmt>
+Parser::declaration()
+{
+	try
+	{
+		if (match(VAR))
+		{
+			return varDeclaration();
+		}
+
+		return statement();
+	}
+	catch (const ParseError &e)
+	{
+		synchronize();
+		return std::shared_ptr<Stmt>();
+	}
+}
+
+std::shared_ptr<Stmt>
+Parser::varDeclaration()
+{
+	std::shared_ptr<Token> name = consume(IDENTIFIER, L"Expect variable name.");
+
+	std::shared_ptr<Expr> initializer;
+	if (match(EQUAL))
+	{
+		initializer = expression();
+	}
+	consume(SEMICOLON, L"Expect ';' after variable declaration.");
+	return std::make_shared<Var>(name, initializer);
+}
+
+std::shared_ptr<Stmt>
 Parser::statement()
 {
 	if (match(PRINT))
 	{
 		return printStatement();
+	}
+	if (match(LEFT_BRACE))
+	{
+		return std::make_shared<Block>(block());
 	}
 	return expressionStatement();
 }
@@ -49,10 +86,51 @@ Parser::expressionStatement()
 	return std::make_shared<Expression>(value);
 }
 
+std::vector<std::shared_ptr<Stmt>>
+Parser::block()
+{
+	std::vector<std::shared_ptr<Stmt>> statements;
+
+	while (!check(RIGHT_BRACE) && !isAtEnd())
+	{
+		statements.push_back(declaration());
+	}
+
+	consume(RIGHT_BRACE, L"Expect '}' after block.");
+	return statements;
+}
+
 std::shared_ptr<Expr>
 Parser::expression()
 {
-	return equality();
+	return assignment();
+}
+
+std::shared_ptr<Expr>
+Parser::assignment()
+{
+	std::shared_ptr<Expr> expr = equality();
+
+	if (match(EQUAL))
+	{
+		std::shared_ptr<Token> equals = previous();
+		std::shared_ptr<Expr> value = assignment();
+
+		try
+		{
+			auto variable = std::any_cast<std::shared_ptr<Variable>>(expr);
+			std::shared_ptr<Token> name = variable->m_name;
+			return std::make_shared<Assign>(name, value);
+		}
+		catch (const std::bad_any_cast &e)
+		{
+		}
+
+		error(equals, L"Invalid assignment target.");
+	}
+
+	return expr;
+
 }
 
 std::shared_ptr<Expr>
@@ -66,7 +144,7 @@ Parser::equality()
 	};
 	while (match(tokenTypes))
 	{
-		std::shared_ptr<Token> op = std::make_shared<Token>(previous());
+		std::shared_ptr<Token> op = previous();
 		std::shared_ptr<Expr> right = comparison();
 		expr = std::make_shared<Binary>(expr, op, right);
 	}
@@ -86,7 +164,7 @@ Parser::comparison()
 	};
 	while (match(tokenTypes))
 	{
-		std::shared_ptr<Token> op = std::make_shared<Token>(previous());
+		std::shared_ptr<Token> op = previous();
 		std::shared_ptr<Expr> right = term();
 		expr = std::make_shared<Binary>(expr, op, right);
 	}
@@ -104,7 +182,7 @@ Parser::term()
 	};
 	while (match(tokenTypes))
 	{
-		std::shared_ptr<Token> op = std::make_shared<Token>(previous());
+		std::shared_ptr<Token> op = previous();
 		std::shared_ptr<Expr> right = factor();
 		expr = std::make_shared<Binary>(expr, op, right);
 	}
@@ -122,7 +200,7 @@ Parser::factor()
 	};
 	while (match(tokenTypes))
 	{
-		std::shared_ptr<Token> op = std::make_shared<Token>(previous());
+		std::shared_ptr<Token> op = previous();
 		std::shared_ptr<Expr> right = unary();
 		expr = std::make_shared<Binary>(expr, op, right);
 	}
@@ -138,7 +216,7 @@ Parser::unary()
 	};
 	if (match(tokenTypes))
 	{
-		std::shared_ptr<Token> op = std::make_shared<Token>(previous());
+		std::shared_ptr<Token> op = previous();
 		std::shared_ptr<Expr> right = unary();
 		return std::make_shared<Unary>(op, right);
 	}
@@ -164,11 +242,15 @@ Parser::primary()
 
 	if (match(STRING))
 	{
-		return std::make_shared<StringLiteral>(previous().string_literal);
+		return std::make_shared<StringLiteral>(previous()->string_literal);
 	}
 	if (match(NUMBER))
 	{
-		return std::make_shared<DoubleLiteral>(previous().double_literal);
+		return std::make_shared<DoubleLiteral>(previous()->double_literal);
+	}
+	if (match(IDENTIFIER))
+	{
+		return std::make_shared<Variable>(previous());
 	}
 
 	if (match(LEFT_PAREN))
@@ -181,7 +263,7 @@ Parser::primary()
 	throw error(peek(), L"Expect expression.");
 }
 
-Token
+std::shared_ptr<Token>
 Parser::consume(TokenType tokenType, const std::wstring &message)
 {
 	if (check(tokenType))
@@ -193,7 +275,7 @@ Parser::consume(TokenType tokenType, const std::wstring &message)
 }
 
 ParseError
-Parser::error(Token token, const std::wstring &message)
+Parser::error(std::shared_ptr<Token> token, const std::wstring &message)
 {
 	Lox::error(token, message);
 	return ParseError(message);
@@ -206,12 +288,12 @@ Parser::synchronize()
 
 	while (!isAtEnd())
 	{
-		if (previous().type == SEMICOLON)
+		if (previous()->type == SEMICOLON)
 		{
 			return;
 		}
 
-		switch (peek().type)
+		switch (peek()->type)
 		{
 		case CLASS:
 		case FUN:
@@ -260,10 +342,10 @@ Parser::check(TokenType tokenType)
 	{
 		return false;
 	}
-	return (peek().type == tokenType);
+	return (peek()->type == tokenType);
 }
 
-Token
+std::shared_ptr<Token>
 Parser::advance()
 {
 	if (!isAtEnd())
@@ -276,16 +358,16 @@ Parser::advance()
 bool
 Parser::isAtEnd()
 {
-	return (peek().type == END_OF_FILE);
+	return (peek()->type == END_OF_FILE);
 }
 
-Token
+std::shared_ptr<Token>
 Parser::peek()
 {
 	return tokens.at(current);
 }
 
-Token
+std::shared_ptr<Token>
 Parser::previous()
 {
 	return tokens.at(current - 1);

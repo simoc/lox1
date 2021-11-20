@@ -3,6 +3,47 @@
 #include "runtimeerror.h"
 #include "lox.h"
 
+Interpreter::Interpreter()
+{
+	environment = std::make_shared<Environment>();
+}
+
+std::any
+Interpreter::visitAssignExpr(std::shared_ptr<Assign> expr)
+{
+	std::any value = evaluate(expr->m_value);
+	auto valueExpr = std::any_cast<std::shared_ptr<Expr>>(value);
+	environment->assign(expr->m_name, valueExpr);
+	return value;
+}
+
+std::any
+Interpreter::visitBlockStmt(std::shared_ptr<Block> stmt)
+{
+	executeBlock(stmt->m_statements, std::make_shared<Environment>(environment));
+	return std::make_shared<NilLiteral>();
+}
+
+void
+Interpreter::executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::shared_ptr<Environment> env)
+{
+	std::shared_ptr<Environment> previous = environment;
+	try
+	{
+		environment = env;
+
+		for (std::shared_ptr<Stmt> statement : statements)
+		{
+			execute(statement);
+		}
+	}
+	catch (const std::exception &e)
+	{
+		environment = previous;
+		throw e;
+	}
+}
+
 std::any
 Interpreter::visitBinaryExpr(std::shared_ptr<Binary> expr)
 {
@@ -134,11 +175,59 @@ Interpreter::visitUnaryExpr(std::shared_ptr<Unary> expr)
 }
 
 std::any
+Interpreter::visitVariableExpr(std::shared_ptr<Variable> expr)
+{
+	std::any value = evaluate(environment->get(expr->m_name));
+	return value;
+}
+
+std::any
 Interpreter::visitPrintStmt(std::shared_ptr<Print> stmt)
 {
 	std::any value = evaluate(stmt->m_expression);
 	std::wcout << stringify(value) << std::endl;
 	return value;
+}
+
+std::any
+Interpreter::visitVarStmt(std::shared_ptr<Var> stmt)
+{
+	if (stmt->m_initializer)
+	{
+		std::any value = evaluate(stmt->m_initializer);
+		try
+		{
+			// TODO: find a way to do this without trying different data types
+			std::shared_ptr<StringLiteral> s = std::any_cast<std::shared_ptr<StringLiteral>>(value);
+			environment->define(stmt->m_name->lexeme, s);
+		}
+		catch (const std::bad_any_cast &e)
+		{
+			try
+			{
+				std::shared_ptr<DoubleLiteral> d = std::any_cast<std::shared_ptr<DoubleLiteral>>(value);
+				environment->define(stmt->m_name->lexeme, d);
+			}
+			catch (const std::bad_any_cast &e)
+			{
+				try
+				{
+					std::shared_ptr<BooleanLiteral> b = std::any_cast<std::shared_ptr<BooleanLiteral>>(value);
+					environment->define(stmt->m_name->lexeme, b);
+				}
+				catch (const std::bad_any_cast &e)
+				{
+					std::shared_ptr<NilLiteral> n = std::any_cast<std::shared_ptr<NilLiteral>>(value);
+					environment->define(stmt->m_name->lexeme, n);
+				}
+			}
+		}
+	}
+	else
+	{
+		environment->define(stmt->m_name->lexeme, std::make_shared<NilLiteral>());
+	}
+	return std::make_shared<NilLiteral>();
 }
 
 std::any

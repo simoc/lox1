@@ -11,6 +11,8 @@ class AstPrinter : public ExprVisitor
 public:
 	std::wstring print(std::shared_ptr<Expr> expr);
 
+	std::any visitAssignExpr(std::shared_ptr<Assign> expr);
+
 	std::any visitBinaryExpr(std::shared_ptr<Binary> expr);
 
 	std::any visitGroupingExpr(std::shared_ptr<Grouping> expr);
@@ -24,6 +26,8 @@ public:
 	std::any visitNilLiteralExpr(std::shared_ptr<NilLiteral> expr);
 
 	std::any visitUnaryExpr(std::shared_ptr<Unary> expr);
+
+	std::any visitVariableExpr(std::shared_ptr<Variable> expr);
 
 	std::any parenthesize(const std::wstring &name, std::shared_ptr<Expr> expr1);
 
