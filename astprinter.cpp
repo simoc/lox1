@@ -55,6 +55,12 @@ AstPrinter::visitBooleanLiteralExpr(std::shared_ptr<BooleanLiteral> expr)
 }
 
 std::any
+AstPrinter::visitLogicalExpr(std::shared_ptr<Logical> expr)
+{
+	return parenthesize(expr->m_operatorX->lexeme, expr->m_left, expr->m_right);
+}
+
+std::any
 AstPrinter::visitNilLiteralExpr(std::shared_ptr<NilLiteral> expr)
 {
 	return std::wstring(L"nil");

@@ -25,6 +25,8 @@ public:
 
 	std::any visitNilLiteralExpr(std::shared_ptr<NilLiteral> expr);
 
+	std::any visitLogicalExpr(std::shared_ptr<Logical> expr);
+
 	std::any visitUnaryExpr(std::shared_ptr<Unary> expr);
 
 	std::any visitVariableExpr(std::shared_ptr<Variable> expr);
