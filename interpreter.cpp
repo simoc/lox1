@@ -152,6 +152,28 @@ Interpreter::visitNilLiteralExpr(std::shared_ptr<NilLiteral> expr)
 }
 
 std::any
+Interpreter::visitLogicalExpr(std::shared_ptr<Logical> expr)
+{
+	std::any left = evaluate(expr->m_left);
+
+	if (expr->m_operatorX->type == TokenType::OR)
+	{
+		if (isTruthy(left))
+		{
+			return left;
+		}
+	}
+	else
+	{
+		if (!isTruthy(left))
+		{
+			return left;
+		}
+	}
+	return evaluate(expr->m_right);
+}
+
+std::any
 Interpreter::visitUnaryExpr(std::shared_ptr<Unary> expr)
 {
 	std::any right = evaluate(expr->m_right);
@@ -179,6 +201,20 @@ Interpreter::visitVariableExpr(std::shared_ptr<Variable> expr)
 {
 	std::any value = evaluate(environment->get(expr->m_name));
 	return value;
+}
+
+std::any
+Interpreter::visitIfStmt(std::shared_ptr<If> stmt)
+{
+	if (isTruthy(evaluate(stmt->m_condition)))
+	{
+		execute(stmt->m_thenBranch);
+	}
+	else if (stmt->m_elseBranch)
+	{
+		execute(stmt->m_elseBranch);
+	}
+	return nullptr;
 }
 
 std::any

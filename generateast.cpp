@@ -245,6 +245,7 @@ main(int argc, char *argv[])
 		L"StringLiteral  : std::wstring value",
 		L"BooleanLiteral  : bool value",
 		L"NilLiteral  :",
+		L"Logical  : std::shared_ptr<Expr> left, std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
 		L"Unary    : std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
 		L"Variable : std::shared_ptr<Token> name"
 	};
@@ -254,6 +255,7 @@ main(int argc, char *argv[])
 	{
 		L"Block      : std::vector<std::shared_ptr<Stmt>> statements",
 		L"Expression : std::shared_ptr<Expr> expression",
+		L"If         : std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> thenBranch, std::shared_ptr<Stmt> elseBranch",
 		L"Print      : std::shared_ptr<Expr> expression",
 		L"Var        : std::shared_ptr<Token> name, std::shared_ptr<Expr> initializer"
 	};

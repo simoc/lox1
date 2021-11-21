@@ -20,6 +20,10 @@ public:
 
 	std::shared_ptr<Expr> assignment();
 
+	std::shared_ptr<Expr> logicalOr();
+
+	std::shared_ptr<Expr> logicalAnd();
+
 	std::shared_ptr<Expr> equality();
 
 	std::shared_ptr<Expr> comparison();
@@ -47,6 +51,8 @@ private:
 	std::shared_ptr<Stmt> varDeclaration();
 
 	std::shared_ptr<Stmt> statement();
+
+	std::shared_ptr<Stmt> ifStatement();
 
 	std::shared_ptr<Stmt> printStatement();
 

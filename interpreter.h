@@ -30,9 +30,13 @@ public:
 
 	std::any visitNilLiteralExpr(std::shared_ptr<NilLiteral> expr);
 
+	std::any visitLogicalExpr(std::shared_ptr<Logical> expr);
+
 	std::any visitUnaryExpr(std::shared_ptr<Unary> expr);
 
 	std::any visitVariableExpr(std::shared_ptr<Variable> expr);
+
+	std::any visitIfStmt(std::shared_ptr<If> stmt);
 
 	std::any visitPrintStmt(std::shared_ptr<Print> expr);
 
