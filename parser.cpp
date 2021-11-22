@@ -138,7 +138,7 @@ Parser::assignment()
 
 		try
 		{
-			auto variable = std::any_cast<std::shared_ptr<Variable>>(expr);
+			auto variable = std::dynamic_pointer_cast<Variable>(expr);
 			std::shared_ptr<Token> name = variable->m_name;
 			return std::make_shared<Assign>(name, value);
 		}
