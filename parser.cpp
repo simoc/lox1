@@ -59,6 +59,10 @@ Parser::varDeclaration()
 std::shared_ptr<Stmt>
 Parser::statement()
 {
+	if (match(FOR))
+	{
+		return forStatement();
+	}
 	if (match(IF))
 	{
 		return ifStatement();
@@ -76,6 +80,65 @@ Parser::statement()
 		return std::make_shared<Block>(block());
 	}
 	return expressionStatement();
+}
+
+std::shared_ptr<Stmt>
+Parser::forStatement()
+{
+	consume(LEFT_PAREN, L"Expect '(' after for.");
+	std::shared_ptr<Stmt> initializer;
+	if (match(SEMICOLON))
+	{
+		// No initializer
+	}
+	else if (match(VAR))
+	{
+		initializer = varDeclaration();
+	}
+	else
+	{
+		initializer = expressionStatement();
+	}
+
+	std::shared_ptr<Expr> condition;
+	if (!check(SEMICOLON))
+	{
+		condition = expression();
+	}
+	else
+	{
+		condition = std::make_shared<BooleanLiteral>(true);
+	}
+	consume(SEMICOLON, L"Expect ';' after loop condition.");
+
+	std::shared_ptr<Expr> increment;
+	if (!check(RIGHT_PAREN))
+	{
+		increment = expression();
+	}
+	consume(RIGHT_PAREN, L"Expect ')' after for clauses.");
+
+	std::shared_ptr<Stmt> body = statement();
+
+	if (increment)
+	{
+		std::vector<std::shared_ptr<Stmt>> statements;
+		statements.push_back(body);
+		statements.push_back(std::make_shared<Expression>(increment));
+		body = std::make_shared<Block>(statements);
+	}
+
+	body = std::make_shared<While>(condition, body);
+
+	if (initializer)
+	{
+		std::vector<std::shared_ptr<Stmt>> statements;
+		statements.push_back(initializer);
+		statements.push_back(body);
+		body = std::make_shared<Block>(statements);
+	}
+
+	return body;
 }
 
 std::shared_ptr<Stmt>
