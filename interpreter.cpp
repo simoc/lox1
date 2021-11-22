@@ -267,6 +267,10 @@ Interpreter::visitVarStmt(std::shared_ptr<Var> stmt)
 		auto expr = castToExpr(value);
 		environment->define(stmt->m_name->lexeme, expr);
 	}
+	else
+	{
+		environment->define(stmt->m_name->lexeme, std::make_shared<NilLiteral>());
+	}
 	return std::make_shared<NilLiteral>();
 }
 
