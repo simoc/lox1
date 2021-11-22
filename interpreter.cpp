@@ -12,9 +12,9 @@ std::any
 Interpreter::visitAssignExpr(std::shared_ptr<Assign> expr)
 {
 	std::any value = evaluate(expr->m_value);
-	auto valueExpr = std::any_cast<std::shared_ptr<Expr>>(value);
+	auto valueExpr = castToExpr(value);
 	environment->assign(expr->m_name, valueExpr);
-	return value;
+	return valueExpr;
 }
 
 std::any
@@ -225,43 +225,57 @@ Interpreter::visitPrintStmt(std::shared_ptr<Print> stmt)
 	return value;
 }
 
+std::shared_ptr<Expr>
+Interpreter::castToExpr(std::any value)
+{
+	try
+	{
+		// TODO: find a way to do this without trying different data types
+		std::shared_ptr<StringLiteral> s = std::any_cast<std::shared_ptr<StringLiteral>>(value);
+		return s;
+	}
+	catch (const std::bad_any_cast &e)
+	{
+		try
+		{
+			std::shared_ptr<DoubleLiteral> d = std::any_cast<std::shared_ptr<DoubleLiteral>>(value);
+			return d;
+		}
+		catch (const std::bad_any_cast &e)
+		{
+			try
+			{
+				std::shared_ptr<BooleanLiteral> b = std::any_cast<std::shared_ptr<BooleanLiteral>>(value);
+				return b;
+			}
+			catch (const std::bad_any_cast &e)
+			{
+				std::shared_ptr<NilLiteral> n = std::any_cast<std::shared_ptr<NilLiteral>>(value);
+				return n;
+			}
+		}
+	}
+	return nullptr;
+}
+
 std::any
 Interpreter::visitVarStmt(std::shared_ptr<Var> stmt)
 {
 	if (stmt->m_initializer)
 	{
 		std::any value = evaluate(stmt->m_initializer);
-		try
-		{
-			// TODO: find a way to do this without trying different data types
-			std::shared_ptr<StringLiteral> s = std::any_cast<std::shared_ptr<StringLiteral>>(value);
-			environment->define(stmt->m_name->lexeme, s);
-		}
-		catch (const std::bad_any_cast &e)
-		{
-			try
-			{
-				std::shared_ptr<DoubleLiteral> d = std::any_cast<std::shared_ptr<DoubleLiteral>>(value);
-				environment->define(stmt->m_name->lexeme, d);
-			}
-			catch (const std::bad_any_cast &e)
-			{
-				try
-				{
-					std::shared_ptr<BooleanLiteral> b = std::any_cast<std::shared_ptr<BooleanLiteral>>(value);
-					environment->define(stmt->m_name->lexeme, b);
-				}
-				catch (const std::bad_any_cast &e)
-				{
-					std::shared_ptr<NilLiteral> n = std::any_cast<std::shared_ptr<NilLiteral>>(value);
-					environment->define(stmt->m_name->lexeme, n);
-				}
-			}
-		}
+		auto expr = castToExpr(value);
+		environment->define(stmt->m_name->lexeme, expr);
 	}
-	else
+	return std::make_shared<NilLiteral>();
+}
+
+std::any
+Interpreter::visitWhileStmt(std::shared_ptr<While> stmt)
+{
+	while (isTruthy(evaluate(stmt->m_condition)))
 	{
-		environment->define(stmt->m_name->lexeme, std::make_shared<NilLiteral>());
+		execute(stmt->m_body);
 	}
 	return std::make_shared<NilLiteral>();
 }

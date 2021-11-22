@@ -257,7 +257,8 @@ main(int argc, char *argv[])
 		L"Expression : std::shared_ptr<Expr> expression",
 		L"If         : std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> thenBranch, std::shared_ptr<Stmt> elseBranch",
 		L"Print      : std::shared_ptr<Expr> expression",
-		L"Var        : std::shared_ptr<Token> name, std::shared_ptr<Expr> initializer"
+		L"Var        : std::shared_ptr<Token> name, std::shared_ptr<Expr> initializer",
+		L"While      : std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> body"
 	};
 	defineAst(outputDir, L"Stmt", statementTypes);
 }

@@ -67,6 +67,10 @@ Parser::statement()
 	{
 		return printStatement();
 	}
+	if (match(WHILE))
+	{
+		return whileStatement();
+	}
 	if (match(LEFT_BRACE))
 	{
 		return std::make_shared<Block>(block());
@@ -88,6 +92,17 @@ Parser::ifStatement()
 		elseBranch = statement();
 	}
 	return std::make_shared<If>(condition, thenBranch, elseBranch);
+}
+
+std::shared_ptr<Stmt>
+Parser::whileStatement()
+{
+	consume(LEFT_PAREN, L"Expect '(' after while.");
+	std::shared_ptr<Expr> condition = expression();
+	consume(RIGHT_PAREN, L"Expect ')' after if condition.");
+
+	std::shared_ptr<Stmt> body = statement();
+	return std::make_shared<While>(condition, body);
 }
 
 std::shared_ptr<Stmt>

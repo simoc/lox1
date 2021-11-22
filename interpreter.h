@@ -44,10 +44,14 @@ public:
 
 	std::any visitVarStmt(std::shared_ptr<Var> expr);
 
+	std::any visitWhileStmt(std::shared_ptr<While> stmt);
+
 	void interpret(std::vector<std::shared_ptr<Stmt>> statements);
 
 private:
 	std::shared_ptr<Environment> environment;
+
+	std::shared_ptr<Expr> castToExpr(std::any value);
 
 	void executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::shared_ptr<Environment> env);
 
