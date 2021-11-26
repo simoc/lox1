@@ -40,6 +40,8 @@ Interpreter::executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::sh
 		{
 			execute(statement);
 		}
+
+		environment = previous;
 	}
 	catch (const std::exception &e)
 	{
