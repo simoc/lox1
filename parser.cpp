@@ -28,6 +28,10 @@ Parser::declaration()
 {
 	try
 	{
+		if (match(FUN))
+		{
+			return functionX(L"function");
+		}
 		if (match(VAR))
 		{
 			return varDeclaration();
@@ -40,6 +44,32 @@ Parser::declaration()
 		synchronize();
 		return std::shared_ptr<Stmt>();
 	}
+}
+
+std::shared_ptr<Stmt>
+Parser::functionX(const std::wstring &kind)
+{
+	std::shared_ptr<Token> name = consume(IDENTIFIER, L"Expect" + kind + L" name.");
+	consume(LEFT_PAREN, L"Expect '(' after " + kind + L" name.");
+	std::vector<std::shared_ptr<Token>> parameters;
+	if (!check(RIGHT_PAREN))
+	{
+		do
+		{
+			if (parameters.size() >= 255)
+			{
+				error(peek(), L"Can't have more than 255 parameters.");
+			}
+
+			parameters.push_back(consume(IDENTIFIER, L"Expect parameter name."));
+		}
+		while (match(COMMA));
+	}
+	consume(RIGHT_PAREN, L"Expect ')' after parameters.");
+
+	consume(LEFT_BRACE, L"Expect '{' before body.");
+	std::vector<std::shared_ptr<Stmt>> body = block();
+	return std::make_shared<Function>(name, parameters, body);
 }
 
 std::shared_ptr<Stmt>
@@ -347,7 +377,47 @@ Parser::unary()
 		return std::make_shared<Unary>(op, right);
 	}
 
-	return primary();
+	return call();
+}
+
+std::shared_ptr<Expr>
+Parser::call()
+{
+	std::shared_ptr<Expr> expr = primary();
+
+	while (true)
+	{
+		if (match(LEFT_PAREN))
+		{
+			expr = finishCall(expr);
+		}
+		else
+		{
+			break;
+		}
+	}
+	return expr;
+}
+
+std::shared_ptr<Expr>
+Parser::finishCall(std::shared_ptr<Expr> callee)
+{
+	std::vector<std::shared_ptr<Expr>> arguments;
+	if (!check(RIGHT_PAREN))
+	{
+		do
+		{
+			if (arguments.size() >= 255)
+			{
+				error(peek(), L"Can't have more than 255 arguments.");
+			}
+			arguments.push_back(expression());
+		}
+		while (match(COMMA));
+	}
+
+	std::shared_ptr<Token> paren = consume(RIGHT_PAREN, L"Expect ')' after arguments.");
+	return std::make_shared<Call>(callee, paren, arguments);
 }
 
 std::shared_ptr<Expr>

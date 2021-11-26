@@ -2,10 +2,15 @@
 #include "interpreter.h"
 #include "runtimeerror.h"
 #include "lox.h"
+#include "clockfunction.h"
+#include "loxfunction.h"
 
 Interpreter::Interpreter()
 {
-	environment = std::make_shared<Environment>();
+	globals = std::make_shared<Environment>();
+	environment = globals;
+
+	globals->define(L"clock", std::make_shared<ClockFunction>());
 }
 
 std::any
@@ -122,6 +127,38 @@ Interpreter::visitBinaryExpr(std::shared_ptr<Binary> expr)
 }
 
 std::any
+Interpreter::visitCallExpr(std::shared_ptr<Call> expr)
+{
+	std::shared_ptr<Expr> callee = evaluate(expr->m_callee);
+
+	std::vector<std::shared_ptr<Expr>> arguments;
+	for (std::shared_ptr<Expr> argument : expr->m_arguments)
+	{
+		arguments.push_back(castToExpr(evaluate(argument)));
+	}
+
+	std::shared_ptr<LoxCallable> func;
+	try
+	{
+		func = std::dynamic_pointer_cast<LoxCallable>(callee);
+	}
+	catch (const std::bad_any_cast &e)
+	{
+		throw RuntimeError(expr->m_paren, L"Can only call functions and classes.");
+	}
+
+	if (arguments.size() != func->arity())
+	{
+		std::wostringstream os;
+		os << L"Expected " << func->arity() << L" arguments but got " <<
+			arguments.size() << L".";
+		throw RuntimeError(expr->m_paren, os.str());
+	}
+
+	return func->call(this, arguments);
+}
+
+std::any
 Interpreter::visitGroupingExpr(std::shared_ptr<Grouping> expr)
 {
 	return evaluate(expr->m_expression);
@@ -201,6 +238,14 @@ Interpreter::visitVariableExpr(std::shared_ptr<Variable> expr)
 {
 	std::any value = environment->get(expr->m_name);
 	return value;
+}
+
+std::any
+Interpreter::visitFunctionStmt(std::shared_ptr<Function> stmt)
+{
+	std::shared_ptr<LoxFunction> func = std::make_shared<LoxFunction>(stmt);
+	environment->define(stmt->m_name->lexeme, func);
+	return std::make_shared<NilLiteral>();
 }
 
 std::any

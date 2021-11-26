@@ -195,6 +195,7 @@ defineAst(char *outputDir,
 	f << L"#pragma once" << std::endl;
 	f << std::endl;
 	f << L"#include <memory>" << std::endl;
+	f << L"#include <vector>" << std::endl;
 	f << L"#include <any>" << std::endl;
 	f << L"#include \"token.h\"" << std::endl;
 	f << std::endl;
@@ -240,6 +241,7 @@ main(int argc, char *argv[])
 	{
 		L"Assign   : std::shared_ptr<Token> name, std::shared_ptr<Expr> value",
 		L"Binary   : std::shared_ptr<Expr> left, std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
+		L"Call     : std::shared_ptr<Expr> callee, std::shared_ptr<Token> paren, std::vector<std::shared_ptr<Expr>> arguments",
 		L"Grouping : std::shared_ptr<Expr> expression",
 		L"DoubleLiteral  : double value",
 		L"StringLiteral  : std::wstring value",
@@ -255,6 +257,7 @@ main(int argc, char *argv[])
 	{
 		L"Block      : std::vector<std::shared_ptr<Stmt>> statements",
 		L"Expression : std::shared_ptr<Expr> expression",
+		L"Function   : std::shared_ptr<Token> name, std::vector<std::shared_ptr<Token>> params, std::vector<std::shared_ptr<Stmt>> body",
 		L"If         : std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> thenBranch, std::shared_ptr<Stmt> elseBranch",
 		L"Print      : std::shared_ptr<Expr> expression",
 		L"Var        : std::shared_ptr<Token> name, std::shared_ptr<Expr> initializer",

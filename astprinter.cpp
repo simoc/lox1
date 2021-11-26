@@ -28,6 +28,18 @@ AstPrinter::visitBinaryExpr(std::shared_ptr<Binary> expr)
 }
 
 std::any
+AstPrinter::visitCallExpr(std::shared_ptr<Call> expr)
+{
+	std::wostringstream os;
+	os << std::any_cast<std::wstring>(parenthesize(L"call", expr->m_callee));
+	for (const auto &argument : expr->m_arguments)
+	{
+		os << std::any_cast<std::wstring>(parenthesize(std::wstring(), argument));
+	}
+	return os.str();
+}
+
+std::any
 AstPrinter::visitGroupingExpr(std::shared_ptr<Grouping> expr)
 {
 	std::wstring grouping(L"group");

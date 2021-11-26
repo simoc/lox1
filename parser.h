@@ -34,6 +34,8 @@ public:
 
 	std::shared_ptr<Expr> unary();
 
+	std::shared_ptr<Expr> call();
+
 	std::shared_ptr<Expr> primary();
 
 	std::shared_ptr<Token> consume(TokenType tokenType, const std::wstring &message);
@@ -47,6 +49,8 @@ private:
 	std::wstring::size_type current = 0;
 
 	std::shared_ptr<Stmt> declaration();
+
+	std::shared_ptr<Stmt> functionX(const std::wstring &kind);
 
 	std::shared_ptr<Stmt> varDeclaration();
 
@@ -63,6 +67,8 @@ private:
 	std::shared_ptr<Stmt> expressionStatement();
 
 	std::vector<std::shared_ptr<Stmt>> block();
+
+	std::shared_ptr<Expr> finishCall(std::shared_ptr<Expr> callee);
 
 	bool match(const std::vector<TokenType> &tokenTypes);
 

@@ -12,6 +12,8 @@
 class Interpreter : public ExprVisitor, public StmtVisitor
 {
 public:
+	std::shared_ptr<Environment> globals;
+
 	Interpreter();
 
 	std::any visitAssignExpr(std::shared_ptr<Assign> expr);
@@ -19,6 +21,8 @@ public:
 	std::any visitBlockStmt(std::shared_ptr<Block> stmt);
 
 	std::any visitBinaryExpr(std::shared_ptr<Binary> expr);
+
+	std::any visitCallExpr(std::shared_ptr<Call> expr);
 
 	std::any visitGroupingExpr(std::shared_ptr<Grouping> expr);
 
@@ -38,6 +42,8 @@ public:
 
 	std::any visitIfStmt(std::shared_ptr<If> stmt);
 
+	std::any visitFunctionStmt(std::shared_ptr<Function> stmt);
+
 	std::any visitPrintStmt(std::shared_ptr<Print> expr);
 
 	std::any visitExpressionStmt(std::shared_ptr<Expression> expr);
@@ -48,12 +54,12 @@ public:
 
 	void interpret(std::vector<std::shared_ptr<Stmt>> statements);
 
+	void executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::shared_ptr<Environment> env);
+
 private:
 	std::shared_ptr<Environment> environment;
 
 	std::shared_ptr<Expr> castToExpr(std::any value);
-
-	void executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::shared_ptr<Environment> env);
 
 	std::shared_ptr<Expr> evaluate(std::shared_ptr<Expr> expr);
 
