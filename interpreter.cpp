@@ -479,6 +479,7 @@ Interpreter::stringify(std::shared_ptr<Expr> n)
 		if (d)
 		{
 			std::wostringstream os;
+			os.precision(15);
 			os << d->m_value;
 			return os.str();
 		}
