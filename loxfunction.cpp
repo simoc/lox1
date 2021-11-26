@@ -15,7 +15,7 @@ LoxFunction::arity()
 std::shared_ptr<Expr>
 LoxFunction::call(Interpreter *interpreter, std::vector<std::shared_ptr<Expr>> arguments)
 {
-	std::shared_ptr<Environment> environment(interpreter->globals);
+	std::shared_ptr<Environment> environment = std::make_shared<Environment>(interpreter->globals);
 	for (std::size_t i = 0; i < declaration->m_params.size(); i++)
 	{
 		environment->define(declaration->m_params.at(i)->lexeme, arguments.at(i));
