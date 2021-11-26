@@ -11,8 +11,7 @@ Interpreter::Interpreter()
 std::any
 Interpreter::visitAssignExpr(std::shared_ptr<Assign> expr)
 {
-	std::any value = evaluate(expr->m_value);
-	auto valueExpr = castToExpr(value);
+	auto valueExpr = evaluate(expr->m_value);
 	environment->assign(expr->m_name, valueExpr);
 	return valueExpr;
 }
@@ -47,28 +46,29 @@ Interpreter::executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::sh
 std::any
 Interpreter::visitBinaryExpr(std::shared_ptr<Binary> expr)
 {
-	std::any left = evaluate(expr->m_left);
-	std::any right = evaluate(expr->m_right);
+	std::shared_ptr<Expr> left = evaluate(expr->m_left);
+	std::shared_ptr<Expr> right = evaluate(expr->m_right);
 
 	if (expr->m_operatorX->type == PLUS)
 	{
 		try
 		{
-			auto leftString = std::any_cast<std::shared_ptr<StringLiteral>>(left);
-			auto rightString = std::any_cast<std::shared_ptr<StringLiteral>>(right);
-			return std::make_shared<StringLiteral>(leftString->m_value + rightString->m_value);
+			auto leftString = std::dynamic_pointer_cast<StringLiteral>(left);
+			auto rightString = std::dynamic_pointer_cast<StringLiteral>(right);
+			if (leftString && rightString)
+			{
+				return std::make_shared<StringLiteral>(leftString->m_value + rightString->m_value);
+			}
+
+			auto leftDouble = std::dynamic_pointer_cast<DoubleLiteral>(left);
+			auto rightDouble = std::dynamic_pointer_cast<DoubleLiteral>(right);
+			if (leftDouble && rightDouble)
+			{
+				return std::make_shared<DoubleLiteral>(leftDouble->m_value + rightDouble->m_value);
+			}
 		}
 		catch (const std::bad_any_cast &e)
 		{
-			try
-			{
-				auto leftDouble = std::any_cast<std::shared_ptr<DoubleLiteral>>(left);
-				auto rightDouble = std::any_cast<std::shared_ptr<DoubleLiteral>>(right);
-				return std::make_shared<DoubleLiteral>(leftDouble->m_value + rightDouble->m_value);
-			}
-			catch (const std::bad_any_cast &e)
-			{
-			}
 		}
 		throw RuntimeError(expr->m_operatorX, L"Operands must be two numbers or two strings.");
 	}
@@ -85,8 +85,8 @@ Interpreter::visitBinaryExpr(std::shared_ptr<Binary> expr)
 
 		checkNumberOperands(expr->m_operatorX, left, right);
 
-		auto leftDouble = std::any_cast<std::shared_ptr<DoubleLiteral>>(left);
-		auto rightDouble = std::any_cast<std::shared_ptr<DoubleLiteral>>(right);
+		auto leftDouble = std::dynamic_pointer_cast<DoubleLiteral>(left);
+		auto rightDouble = std::dynamic_pointer_cast<DoubleLiteral>(right);
 
 		if (expr->m_operatorX->type == MINUS)
 		{
@@ -154,7 +154,7 @@ Interpreter::visitNilLiteralExpr(std::shared_ptr<NilLiteral> expr)
 std::any
 Interpreter::visitLogicalExpr(std::shared_ptr<Logical> expr)
 {
-	std::any left = evaluate(expr->m_left);
+	std::shared_ptr<Expr> left = evaluate(expr->m_left);
 
 	if (expr->m_operatorX->type == TokenType::OR)
 	{
@@ -163,7 +163,7 @@ Interpreter::visitLogicalExpr(std::shared_ptr<Logical> expr)
 			return left;
 		}
 	}
-	else
+	else // TOkenType::AND
 	{
 		if (!isTruthy(left))
 		{
@@ -176,11 +176,11 @@ Interpreter::visitLogicalExpr(std::shared_ptr<Logical> expr)
 std::any
 Interpreter::visitUnaryExpr(std::shared_ptr<Unary> expr)
 {
-	std::any right = evaluate(expr->m_right);
+	std::shared_ptr<Expr> right = evaluate(expr->m_right);
 	if (expr->m_operatorX->type == MINUS)
 	{
 		checkNumberOperand(expr->m_operatorX, right);
-		auto ptr = std::any_cast<std::shared_ptr<DoubleLiteral>>(right);
+		auto ptr = std::dynamic_pointer_cast<DoubleLiteral>(right);
 		if (ptr)
 		{
 			auto neg = std::make_shared<DoubleLiteral>(-ptr->m_value);
@@ -199,7 +199,7 @@ Interpreter::visitUnaryExpr(std::shared_ptr<Unary> expr)
 std::any
 Interpreter::visitVariableExpr(std::shared_ptr<Variable> expr)
 {
-	std::any value = evaluate(environment->get(expr->m_name));
+	std::any value = environment->get(expr->m_name);
 	return value;
 }
 
@@ -220,7 +220,7 @@ Interpreter::visitIfStmt(std::shared_ptr<If> stmt)
 std::any
 Interpreter::visitPrintStmt(std::shared_ptr<Print> stmt)
 {
-	std::any value = evaluate(stmt->m_expression);
+	std::shared_ptr<Expr> value = evaluate(stmt->m_expression);
 	std::wcout << stringify(value) << std::endl;
 	return value;
 }
@@ -250,8 +250,16 @@ Interpreter::castToExpr(std::any value)
 			}
 			catch (const std::bad_any_cast &e)
 			{
-				std::shared_ptr<NilLiteral> n = std::any_cast<std::shared_ptr<NilLiteral>>(value);
-				return n;
+				try
+				{
+					std::shared_ptr<NilLiteral> n = std::any_cast<std::shared_ptr<NilLiteral>>(value);
+					return n;
+				}
+				catch (const std::bad_any_cast &e)
+				{
+					std::shared_ptr<Expr> expr = std::any_cast<std::shared_ptr<Expr>>(value);
+					return expr;
+				}
 			}
 		}
 	}
@@ -263,8 +271,7 @@ Interpreter::visitVarStmt(std::shared_ptr<Var> stmt)
 {
 	if (stmt->m_initializer)
 	{
-		std::any value = evaluate(stmt->m_initializer);
-		auto expr = castToExpr(value);
+		auto expr = evaluate(stmt->m_initializer);
 		environment->define(stmt->m_name->lexeme, expr);
 	}
 	else
@@ -292,12 +299,15 @@ Interpreter::visitExpressionStmt(std::shared_ptr<Expression> stmt)
 }
 
 void
-Interpreter::checkNumberOperand(std::shared_ptr<Token> operatorX, std::any operand)
+Interpreter::checkNumberOperand(std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> operand)
 {
 	try
 	{
-		std::any_cast<std::shared_ptr<DoubleLiteral>>(operand);
-		return;
+		std::shared_ptr<DoubleLiteral> d = std::dynamic_pointer_cast<DoubleLiteral>(operand);
+		if (d)
+		{
+			return;
+		}
 	}
 	catch (const std::bad_any_cast &e)
 	{
@@ -307,14 +317,17 @@ Interpreter::checkNumberOperand(std::shared_ptr<Token> operatorX, std::any opera
 
 void
 Interpreter::checkNumberOperands(std::shared_ptr<Token> operatorX,
-	std::any left,
-	std::any right)
+	std::shared_ptr<Expr> left,
+	std::shared_ptr<Expr> right)
 {
 	try
 	{
-		std::any_cast<std::shared_ptr<DoubleLiteral>>(left);
-		std::any_cast<std::shared_ptr<DoubleLiteral>>(right);
-		return;
+		std::dynamic_pointer_cast<DoubleLiteral>(left);
+		std::dynamic_pointer_cast<DoubleLiteral>(right);
+		if (left && right)
+		{
+			return;
+		}
 	}
 	catch (const std::bad_any_cast &e)
 	{
@@ -323,121 +336,112 @@ Interpreter::checkNumberOperands(std::shared_ptr<Token> operatorX,
 }
 
 bool
-Interpreter::isTruthy(std::any n)
+Interpreter::isTruthy(std::shared_ptr<Expr> n)
 {
 	try
 	{
-		auto nilValue = std::any_cast<std::shared_ptr<NilLiteral>>(n);
-		return false;
+		auto nilValue = std::dynamic_pointer_cast<NilLiteral>(n);
+		if (nilValue)
+		{
+			return false;
+		}
+		auto booleanValue = std::dynamic_pointer_cast<BooleanLiteral>(n);
+		if (booleanValue)
+		{
+			return booleanValue->m_value;
+		}
 	}
 	catch (const std::bad_any_cast &e)
 	{
-		try
-		{
-			auto booleanValue = std::any_cast<std::shared_ptr<BooleanLiteral>>(n);
-			return booleanValue->m_value;
-		}
-		catch (const std::bad_any_cast &e)
-		{
-		}
 	}
 	return true;
 }
 
 bool
-Interpreter::isEqual(std::any a, std::any b)
+Interpreter::isEqual(std::shared_ptr<Expr> a, std::shared_ptr<Expr> b)
 {
 	try
 	{
-		std::any_cast<std::shared_ptr<NilLiteral>>(a);
-		try
+		std::shared_ptr<NilLiteral> na = std::dynamic_pointer_cast<NilLiteral>(a);
+		std::shared_ptr<NilLiteral> nb = std::dynamic_pointer_cast<NilLiteral>(b);
+		if (na && nb)
 		{
-			std::any_cast<std::shared_ptr<NilLiteral>>(b);
+			return true;
 		}
-		catch (const std::bad_any_cast &e)
+		else if (na)
 		{
 			return false;
 		}
-		return true;
+
+		std::shared_ptr<DoubleLiteral> da = std::dynamic_pointer_cast<DoubleLiteral>(a);
+		std::shared_ptr<DoubleLiteral> db = std::dynamic_pointer_cast<DoubleLiteral>(b);
+		if (da && db)
+		{
+			return (da->m_value == db->m_value);
+		}
+
+		std::shared_ptr<StringLiteral> sa = std::dynamic_pointer_cast<StringLiteral>(a);
+		std::shared_ptr<StringLiteral> sb = std::dynamic_pointer_cast<StringLiteral>(b);
+		if (sa && sb)
+		{
+			return (sa->m_value == sb->m_value);
+		}
+
+		std::shared_ptr<BooleanLiteral> ba = std::dynamic_pointer_cast<BooleanLiteral>(a);
+		std::shared_ptr<BooleanLiteral> bb = std::dynamic_pointer_cast<BooleanLiteral>(b);
+		if (ba && bb)
+		{
+			return (ba->m_value == bb->m_value);
+		}
 	}
 	catch (const std::bad_any_cast &e)
 	{
-		try
-		{
-			std::shared_ptr<DoubleLiteral> da = std::any_cast<std::shared_ptr<DoubleLiteral>>(a);
-			std::shared_ptr<DoubleLiteral> db = std::any_cast<std::shared_ptr<DoubleLiteral>>(b);
-			return (da->m_value == db->m_value);
-		}
-		catch (const std::bad_any_cast &e)
-		{
-			try
-			{
-				std::shared_ptr<StringLiteral> sa = std::any_cast<std::shared_ptr<StringLiteral>>(a);
-				std::shared_ptr<StringLiteral> sb = std::any_cast<std::shared_ptr<StringLiteral>>(b);
-				return (sa->m_value == sb->m_value);
-			}
-			catch (const std::bad_any_cast &e)
-			{
-				try
-				{
-					std::shared_ptr<BooleanLiteral> ba = std::any_cast<std::shared_ptr<BooleanLiteral>>(a);
-					std::shared_ptr<BooleanLiteral> bb = std::any_cast<std::shared_ptr<BooleanLiteral>>(b);
-					return (ba->m_value == bb->m_value);
-				}
-				catch (const std::bad_any_cast &e)
-				{
-				}
-			}
-		}
 	}
 	return false;
 }
 
-std::any
+std::shared_ptr<Expr>
 Interpreter::evaluate(std::shared_ptr<Expr> expr)
 {
 	std::any result = expr->accept(this);
-	return result;
+	return castToExpr(result);
 }
 
 std::wstring
-Interpreter::stringify(std::any n)
+Interpreter::stringify(std::shared_ptr<Expr> n)
 {
 	try
 	{
-		std::any_cast<std::shared_ptr<NilLiteral>>(n);
-		return std::wstring(L"nil");
+		std::shared_ptr<NilLiteral> n2 = std::dynamic_pointer_cast<NilLiteral>(n);
+		if (n2)
+		{
+			return std::wstring(L"nil");
+		}
+
+		std::shared_ptr<StringLiteral> s = std::dynamic_pointer_cast<StringLiteral>(n);
+		if (s)
+		{
+			return s->m_value;
+		}
+
+		std::shared_ptr<BooleanLiteral> b = std::dynamic_pointer_cast<BooleanLiteral>(n);
+		if (b)
+		{
+			return b->m_value ? std::wstring(L"true") : std::wstring(L"false");
+		}
+
+		std::shared_ptr<DoubleLiteral> d = std::dynamic_pointer_cast<DoubleLiteral>(n);
+		if (d)
+		{
+			std::wostringstream os;
+			os << d->m_value;
+			return os.str();
+		}
 	}
 	catch (const std::bad_any_cast &e)
 	{
-		try
-		{
-			std::shared_ptr<StringLiteral> s = std::any_cast<std::shared_ptr<StringLiteral>>(n);
-			return s->m_value;
-		}
-		catch (const std::bad_any_cast &e)
-		{
-			try
-			{
-				std::shared_ptr<BooleanLiteral> b = std::any_cast<std::shared_ptr<BooleanLiteral>>(n);
-				return b->m_value ? std::wstring(L"true") : std::wstring(L"false");
-			}
-			catch (const std::bad_any_cast &e)
-			{
-				try
-				{
-					std::shared_ptr<DoubleLiteral> d = std::any_cast<std::shared_ptr<DoubleLiteral>>(n);
-					std::wostringstream os;
-					os << d->m_value;
-					return os.str();
-				}
-				catch (const std::bad_any_cast &e)
-				{
-				}
-			}
-		}
 	}
-	return std::wstring();
+	return std::wstring(L"");
 }
 
 void

@@ -55,17 +55,17 @@ private:
 
 	void executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::shared_ptr<Environment> env);
 
-	std::any evaluate(std::shared_ptr<Expr> expr);
+	std::shared_ptr<Expr> evaluate(std::shared_ptr<Expr> expr);
 
-	std::wstring stringify(std::any n);
+	std::wstring stringify(std::shared_ptr<Expr> n);
 
-	bool isEqual(std::any a, std::any b);
+	bool isEqual(std::shared_ptr<Expr> a, std::shared_ptr<Expr> b);
 
-	void checkNumberOperand(std::shared_ptr<Token> operatorX, std::any operand);
+	void checkNumberOperand(std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> operand);
 
-	void checkNumberOperands(std::shared_ptr<Token> operatorX, std::any left, std::any right);
+	void checkNumberOperands(std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> left, std::shared_ptr<Expr> right);
 
-	bool isTruthy(std::any n);
+	bool isTruthy(std::shared_ptr<Expr> n);
 
 	void execute(std::shared_ptr<Stmt> stmt);
 };
