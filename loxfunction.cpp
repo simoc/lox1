@@ -1,5 +1,5 @@
 #include "loxfunction.h"
-
+#include "returnerror.h"
 
 LoxFunction::LoxFunction(std::shared_ptr<Function> _declaration) :
 	declaration(_declaration)
@@ -20,7 +20,14 @@ LoxFunction::call(Interpreter *interpreter, std::vector<std::shared_ptr<Expr>> a
 	{
 		environment->define(declaration->m_params.at(i)->lexeme, arguments.at(i));
 	}
-	interpreter->executeBlock(declaration->m_body, environment);
+	try
+	{
+		interpreter->executeBlock(declaration->m_body, environment);
+	}
+	catch (const ReturnError &e)
+	{
+		return e.value;
+	}
 	return std::make_shared<NilLiteral>();
 }
 

@@ -4,6 +4,7 @@
 #include "lox.h"
 #include "clockfunction.h"
 #include "loxfunction.h"
+#include "returnerror.h"
 
 Interpreter::Interpreter()
 {
@@ -42,6 +43,11 @@ Interpreter::executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::sh
 		}
 
 		environment = previous;
+	}
+	catch (const ReturnError &e)
+	{
+		environment = previous;
+		throw e;
 	}
 	catch (const std::exception &e)
 	{
@@ -270,6 +276,17 @@ Interpreter::visitPrintStmt(std::shared_ptr<Print> stmt)
 	std::shared_ptr<Expr> value = evaluate(stmt->m_expression);
 	std::wcout << stringify(value) << std::endl;
 	return value;
+}
+
+std::any
+Interpreter::visitReturnStmt(std::shared_ptr<Return> stmt)
+{
+	std::shared_ptr<Expr> value;
+	if (stmt->m_value)
+	{
+		value = evaluate(stmt->m_value);
+	}
+	throw ReturnError(value);
 }
 
 std::shared_ptr<Expr>

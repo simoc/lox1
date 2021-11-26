@@ -46,6 +46,8 @@ public:
 
 	std::any visitPrintStmt(std::shared_ptr<Print> expr);
 
+	std::any visitReturnStmt(std::shared_ptr<Return> stmt);
+
 	std::any visitExpressionStmt(std::shared_ptr<Expression> expr);
 
 	std::any visitVarStmt(std::shared_ptr<Var> expr);

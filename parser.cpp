@@ -101,6 +101,10 @@ Parser::statement()
 	{
 		return printStatement();
 	}
+	if (match(RETURN))
+	{
+		return returnStatement();
+	}
 	if (match(WHILE))
 	{
 		return whileStatement();
@@ -204,6 +208,19 @@ Parser::printStatement()
 	std::shared_ptr<Expr> value = expression();
 	consume(SEMICOLON, L"Expect ';' after value.");
 	return std::make_shared<Print>(value);
+}
+
+std::shared_ptr<Stmt>
+Parser::returnStatement()
+{
+	std::shared_ptr<Token> keyword = previous();
+	std::shared_ptr<Expr> value;
+	if (!check(SEMICOLON))
+	{
+		value = expression();
+	}
+	consume(SEMICOLON, L"Expect ';' after return value.");
+	return std::make_shared<Return>(keyword, value);
 }
 
 std::shared_ptr<Stmt>

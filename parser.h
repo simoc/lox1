@@ -64,6 +64,8 @@ private:
 
 	std::shared_ptr<Stmt> printStatement();
 
+	std::shared_ptr<Stmt> returnStatement();
+
 	std::shared_ptr<Stmt> expressionStatement();
 
 	std::vector<std::shared_ptr<Stmt>> block();

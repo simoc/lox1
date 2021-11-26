@@ -260,6 +260,7 @@ main(int argc, char *argv[])
 		L"Function   : std::shared_ptr<Token> name, std::vector<std::shared_ptr<Token>> params, std::vector<std::shared_ptr<Stmt>> body",
 		L"If         : std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> thenBranch, std::shared_ptr<Stmt> elseBranch",
 		L"Print      : std::shared_ptr<Expr> expression",
+		L"Return     : std::shared_ptr<Token> keyword, std::shared_ptr<Expr> value",
 		L"Var        : std::shared_ptr<Token> name, std::shared_ptr<Expr> initializer",
 		L"While      : std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> body"
 	};
