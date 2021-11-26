@@ -485,6 +485,12 @@ Interpreter::stringify(std::shared_ptr<Expr> n)
 			os << d->m_value;
 			return os.str();
 		}
+
+		std::shared_ptr<LoxFunction> f = std::dynamic_pointer_cast<LoxFunction>(n);
+		if (f)
+		{
+			return f->toString();
+		}
 	}
 	catch (const std::bad_any_cast &e)
 	{

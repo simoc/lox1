@@ -29,3 +29,9 @@ LoxFunction::accept(ExprVisitor *visitor)
 {
 	return std::make_shared<NilLiteral>();
 }
+
+std::wstring
+LoxFunction::toString()
+{
+	return L"<fn " + declaration->m_name->lexeme + L">";
+}

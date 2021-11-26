@@ -12,6 +12,8 @@ public:
 	std::shared_ptr<Expr> call(Interpreter *interpreter, std::vector<std::shared_ptr<Expr>> arguments);
 
 	std::any accept(ExprVisitor *visitor);
+
+	std::wstring toString();
 private:
 	std::shared_ptr<Function> declaration;
 };
