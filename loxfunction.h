@@ -1,11 +1,14 @@
 #pragma once
 
+#include <memory>
+
 #include "loxcallable.h"
+#include "environment.h"
 
 class LoxFunction : public LoxCallable
 {
 public:
-	LoxFunction(std::shared_ptr<Function> _declaration);
+	LoxFunction(std::shared_ptr<Function> _declaration, std::shared_ptr<Environment> _closure);
 
 	std::size_t arity();
 
@@ -16,4 +19,6 @@ public:
 	std::wstring toString();
 private:
 	std::shared_ptr<Function> declaration;
+
+	std::shared_ptr<Environment> closure;
 };

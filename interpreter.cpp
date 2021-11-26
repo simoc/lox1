@@ -251,7 +251,7 @@ Interpreter::visitVariableExpr(std::shared_ptr<Variable> expr)
 std::any
 Interpreter::visitFunctionStmt(std::shared_ptr<Function> stmt)
 {
-	std::shared_ptr<LoxFunction> func = std::make_shared<LoxFunction>(stmt);
+	std::shared_ptr<LoxFunction> func = std::make_shared<LoxFunction>(stmt, environment);
 	environment->define(stmt->m_name->lexeme, func);
 	return std::make_shared<NilLiteral>();
 }
