@@ -6,6 +6,7 @@
 #include "scanner.h"
 #include "parser.h"
 #include "expr.h"
+#include "resolver.h"
 
 bool Lox::hadError = false;
 bool Lox::hadRuntimeError = false;
@@ -59,6 +60,10 @@ Lox::run(const std::wstring &bytes)
 	{
 		return;
 	}
+
+	Resolver resolver(interpreter);
+	resolver.resolve(statements);
+
 	interpreter.interpret(statements);
 }
 

@@ -3,12 +3,12 @@
 
 Environment::Environment()
 {
-};
+}
 
 Environment::Environment(std::shared_ptr<Environment> enclosingEnvironment)
 {
 	enclosing = enclosingEnvironment;
-};
+}
 
 void
 Environment::define(const std::wstring &name, std::shared_ptr<Expr> value)
@@ -34,6 +34,28 @@ Environment::get(std::shared_ptr<Token> name)
 	throw RuntimeError(name, L"Undefined variable '" + name->lexeme + L"'.");
 }
 
+std::shared_ptr<Expr>
+Environment::getAt(int distance, std::shared_ptr<Token> name)
+{
+	return ancestor(distance)->get(name);
+}
+
+std::shared_ptr<Environment>
+Environment::ancestor(int distance)
+{
+	if (distance == 0)
+	{
+		return shared_from_this();
+	}
+
+	std::shared_ptr<Environment> env = this->enclosing;
+	for (int i = 1; i < distance; i++)
+	{
+		env = env->enclosing;
+	}
+	return env;
+}
+
 void
 Environment::assign(std::shared_ptr<Token> name, std::shared_ptr<Expr> value)
 {
@@ -52,3 +74,10 @@ Environment::assign(std::shared_ptr<Token> name, std::shared_ptr<Expr> value)
 
 	throw RuntimeError(name, L"Undefined variable '" + name->lexeme + L"'.");
 }
+
+void
+Environment::assignAt(int distance, std::shared_ptr<Token> name, std::shared_ptr<Expr> value)
+{
+	ancestor(distance)->values.insert_or_assign(name->lexeme, value);
+}
+

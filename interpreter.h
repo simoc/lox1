@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <map>
 
 #include "token.h"
 #include "expr.h"
@@ -58,8 +59,11 @@ public:
 
 	void executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::shared_ptr<Environment> env);
 
+	void resolve(std::shared_ptr<Expr> expr, int depth);
+
 private:
 	std::shared_ptr<Environment> environment;
+	std::map<std::shared_ptr<Expr>, int> locals;
 
 	std::shared_ptr<Expr> castToExpr(std::any value);
 
@@ -76,4 +80,6 @@ private:
 	bool isTruthy(std::shared_ptr<Expr> n);
 
 	void execute(std::shared_ptr<Stmt> stmt);
+
+	std::any lookUpVariable(std::shared_ptr<Token> name, std::shared_ptr<Expr> expr);
 };

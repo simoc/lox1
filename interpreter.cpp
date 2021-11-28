@@ -18,7 +18,17 @@ std::any
 Interpreter::visitAssignExpr(std::shared_ptr<Assign> expr)
 {
 	auto valueExpr = evaluate(expr->m_value);
-	environment->assign(expr->m_name, valueExpr);
+
+	auto it = locals.find(expr);
+	if (it != locals.end())
+	{
+		int distance = it->second;
+		environment->assignAt(distance, expr->m_name, valueExpr);
+	}
+	else
+	{
+		globals->assign(expr->m_name, valueExpr);
+	}
 	return valueExpr;
 }
 
@@ -244,8 +254,22 @@ Interpreter::visitUnaryExpr(std::shared_ptr<Unary> expr)
 std::any
 Interpreter::visitVariableExpr(std::shared_ptr<Variable> expr)
 {
-	std::any value = environment->get(expr->m_name);
-	return value;
+	return lookUpVariable(expr->m_name, expr);
+}
+
+std::any
+Interpreter::lookUpVariable(std::shared_ptr<Token> name, std::shared_ptr<Expr> expr)
+{
+	auto it = locals.find(expr);
+	if (it != locals.end())
+	{
+		int distance = it->second;
+		return environment->getAt(distance, name);
+	}
+	else
+	{
+		return globals->get(name);
+	}
 }
 
 std::any
@@ -535,4 +559,10 @@ void
 Interpreter::execute(std::shared_ptr<Stmt> stmt)
 {
 	stmt->accept(this);
+}
+
+void
+Interpreter::resolve(std::shared_ptr<Expr> expr, int depth)
+{
+	locals.insert_or_assign(expr, depth);
 }

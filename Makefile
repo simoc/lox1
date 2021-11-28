@@ -14,7 +14,7 @@ astprinter.cpp: expr.h
 astprintermain: astprintermain.cpp astprinter.cpp token.cpp
 	gcc $(CXXFLAGS) -o $@ $^ -lstdc++
 
-lox1: main.cpp lox.cpp scanner.cpp token.cpp parser.cpp interpreter.cpp environment.cpp clockfunction.cpp loxfunction.cpp
+lox1: main.cpp lox.cpp scanner.cpp token.cpp parser.cpp interpreter.cpp environment.cpp clockfunction.cpp loxfunction.cpp resolver.cpp
 	gcc $(CXXFLAGS) -o $@ $^ -lstdc++
 
 all: generateast astprintermain lox1

@@ -7,7 +7,7 @@
 
 #include "expr.h"
 
-class Environment
+class Environment : public std::enable_shared_from_this<Environment>
 {
 public:
 	Environment();
@@ -18,9 +18,15 @@ public:
 
 	std::shared_ptr<Expr> get(std::shared_ptr<Token> name);
 
+	std::shared_ptr<Expr> getAt(int distance, std::shared_ptr<Token> name);
+
 	void assign(std::shared_ptr<Token> name, std::shared_ptr<Expr> value);
+
+	void assignAt(int distance, std::shared_ptr<Token> name, std::shared_ptr<Expr> value);
 
 private:
 	std::map<std::wstring, std::shared_ptr<Expr>> values;
 	std::shared_ptr<Environment> enclosing;
+
+	std::shared_ptr<Environment> ancestor(int distance);
 };
