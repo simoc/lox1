@@ -64,6 +64,11 @@ Lox::run(const std::wstring &bytes)
 	Resolver resolver(interpreter);
 	resolver.resolve(statements);
 
+	if (hadError)
+	{
+		return;
+	}
+
 	interpreter.interpret(statements);
 }
 

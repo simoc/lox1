@@ -114,7 +114,7 @@ Resolver::visitFunctionStmt(std::shared_ptr<Function> stmt)
 {
 	declare(stmt->m_name);
 	define(stmt->m_name);
-	resolveFunction(stmt);
+	resolveFunction(stmt, FunctionType::FUNCTION);
 	return nullptr;
 }
 
@@ -128,6 +128,11 @@ Resolver::visitPrintStmt(std::shared_ptr<Print> stmt)
 std::any
 Resolver::visitReturnStmt(std::shared_ptr<Return> stmt)
 {
+	if (currentFunction == FunctionType::NONE)
+	{
+		Lox::error(stmt->m_keyword, L"Can't return from top-level code.");
+	}
+
 	if (stmt->m_value)
 	{
 		resolve(stmt->m_value);
@@ -246,8 +251,11 @@ Resolver::resolveLocal(std::shared_ptr<Expr> expr, std::shared_ptr<Token> name)
 }
 
 void
-Resolver::resolveFunction(std::shared_ptr<Function> func)
+Resolver::resolveFunction(std::shared_ptr<Function> func, FunctionType type)
 {
+	FunctionType enclosingFunction = currentFunction;
+	currentFunction = type;
+
 	beginScope();
 	for (std::shared_ptr<Token> param : func->m_params)
 	{
@@ -256,4 +264,6 @@ Resolver::resolveFunction(std::shared_ptr<Function> func)
 	}
 	resolve(func->m_body);
 	endScope();
+
+	currentFunction = enclosingFunction;
 }

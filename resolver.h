@@ -7,6 +7,16 @@
 #include "stmt.h"
 #include "interpreter.h"
 
+/*
+ * Indicates whether resolver is currently in a function, or not.
+ * From 11.5, Resolution Errors.
+ */
+enum class FunctionType
+{
+	NONE,
+	FUNCTION
+};
+
 /**
  * Resolves lox programs, from Chapter 11.
  */
@@ -58,7 +68,7 @@ public:
 private:
 	Interpreter &interpreter;
 	std::vector<std::map<std::wstring, bool>> scopes;
-
+	FunctionType currentFunction = FunctionType::NONE;
 
 	void resolve(std::shared_ptr<Stmt> statement);
 
@@ -74,5 +84,5 @@ private:
 
 	void resolveLocal(std::shared_ptr<Expr> expr, std::shared_ptr<Token> name);
 
-	void resolveFunction(std::shared_ptr<Function> func);
+	void resolveFunction(std::shared_ptr<Function> func, FunctionType type);
 };
