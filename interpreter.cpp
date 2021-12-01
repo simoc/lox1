@@ -6,6 +6,7 @@
 #include "loxfunction.h"
 #include "returnerror.h"
 #include "loxclass.h"
+#include "loxinstance.h"
 
 Interpreter::Interpreter()
 {
@@ -547,6 +548,12 @@ Interpreter::stringify(std::shared_ptr<Expr> n)
 		if (c)
 		{
 			return c->toString();
+		}
+
+		std::shared_ptr<LoxInstance> i = std::dynamic_pointer_cast<LoxInstance>(n);
+		if (i)
+		{
+			return i->toString();
 		}
 	}
 	catch (const std::bad_any_cast &e)
