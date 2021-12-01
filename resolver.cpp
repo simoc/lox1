@@ -157,6 +157,14 @@ Resolver::visitBlockStmt(std::shared_ptr<Block> stmt)
 }
 
 std::any
+Resolver::visitClassStmt(std::shared_ptr<Class> stmt)
+{
+	declare(stmt->m_name);
+	define(stmt->m_name);
+	return nullptr;
+}
+
+std::any
 Resolver::visitVarStmt(std::shared_ptr<Var> stmt)
 {
 	declare(stmt->m_name);

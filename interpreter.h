@@ -21,6 +21,8 @@ public:
 
 	std::any visitBlockStmt(std::shared_ptr<Block> stmt);
 
+	std::any visitClassStmt(std::shared_ptr<Class> stmt);
+
 	std::any visitBinaryExpr(std::shared_ptr<Binary> expr);
 
 	std::any visitCallExpr(std::shared_ptr<Call> expr);

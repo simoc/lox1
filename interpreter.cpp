@@ -5,6 +5,7 @@
 #include "clockfunction.h"
 #include "loxfunction.h"
 #include "returnerror.h"
+#include "loxclass.h"
 
 Interpreter::Interpreter()
 {
@@ -36,6 +37,15 @@ std::any
 Interpreter::visitBlockStmt(std::shared_ptr<Block> stmt)
 {
 	executeBlock(stmt->m_statements, std::make_shared<Environment>(environment));
+	return std::make_shared<NilLiteral>();
+}
+
+std::any
+Interpreter::visitClassStmt(std::shared_ptr<Class> stmt)
+{
+	environment->define(stmt->m_name->lexeme, std::make_shared<NilLiteral>());
+	std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->m_name->lexeme);
+	environment->assign(stmt->m_name, klass);
 	return std::make_shared<NilLiteral>();
 }
 
@@ -531,6 +541,12 @@ Interpreter::stringify(std::shared_ptr<Expr> n)
 		if (f)
 		{
 			return f->toString();
+		}
+
+		std::shared_ptr<LoxClass> c = std::dynamic_pointer_cast<LoxClass>(n);
+		if (c)
+		{
+			return c->toString();
 		}
 	}
 	catch (const std::bad_any_cast &e)

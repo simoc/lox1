@@ -28,6 +28,10 @@ Parser::declaration()
 {
 	try
 	{
+		if (match(CLASS))
+		{
+			return classDeclaration();
+		}
 		if (match(FUN))
 		{
 			return functionX(L"function");
@@ -44,6 +48,24 @@ Parser::declaration()
 		synchronize();
 		return std::shared_ptr<Stmt>();
 	}
+}
+
+std::shared_ptr<Stmt>
+Parser::classDeclaration()
+{
+	std::shared_ptr<Token> name = consume(IDENTIFIER, L"Expect a class name.");
+	consume(LEFT_BRACE, L"Expect '{' before class body.");
+
+	std::vector<std::shared_ptr<Function>> methods;
+	while (!check(RIGHT_BRACE) && !isAtEnd())
+	{
+		auto func = functionX(L"method");
+		methods.push_back(std::dynamic_pointer_cast<Function>(func));
+	}
+
+	consume(RIGHT_BRACE, L"Expect '}' after class body.");
+
+	return std::make_shared<Class>(name, methods);
 }
 
 std::shared_ptr<Stmt>

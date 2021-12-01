@@ -50,6 +50,8 @@ private:
 
 	std::shared_ptr<Stmt> declaration();
 
+	std::shared_ptr<Stmt> classDeclaration();
+
 	std::shared_ptr<Stmt> functionX(const std::wstring &kind);
 
 	std::shared_ptr<Stmt> varDeclaration();
