@@ -242,12 +242,14 @@ main(int argc, char *argv[])
 		L"Assign   : std::shared_ptr<Token> name, std::shared_ptr<Expr> value",
 		L"Binary   : std::shared_ptr<Expr> left, std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
 		L"Call     : std::shared_ptr<Expr> callee, std::shared_ptr<Token> paren, std::vector<std::shared_ptr<Expr>> arguments",
+		L"Get      : std::shared_ptr<Expr> object, std::shared_ptr<Token> name",
 		L"Grouping : std::shared_ptr<Expr> expression",
 		L"DoubleLiteral  : double value",
 		L"StringLiteral  : std::wstring value",
 		L"BooleanLiteral  : bool value",
 		L"NilLiteral  :",
 		L"Logical  : std::shared_ptr<Expr> left, std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
+		L"Set      : std::shared_ptr<Expr> object, std::shared_ptr<Token> name, std::shared_ptr<Expr> value",
 		L"Unary    : std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
 		L"Variable : std::shared_ptr<Token> name"
 	};

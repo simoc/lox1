@@ -188,6 +188,19 @@ Interpreter::visitCallExpr(std::shared_ptr<Call> expr)
 }
 
 std::any
+Interpreter::visitGetExpr(std::shared_ptr<Get> expr)
+{
+	std::shared_ptr<Expr> obj = evaluate(expr->m_object);
+	std::shared_ptr<LoxInstance> inst = std::dynamic_pointer_cast<LoxInstance>(obj);
+	if (inst)
+	{
+		return inst->get(expr->m_name);
+	}
+
+	throw RuntimeError(expr->m_name, L"Only instances have properties.");
+}
+
+std::any
 Interpreter::visitGroupingExpr(std::shared_ptr<Grouping> expr)
 {
 	return evaluate(expr->m_expression);
@@ -237,6 +250,21 @@ Interpreter::visitLogicalExpr(std::shared_ptr<Logical> expr)
 		}
 	}
 	return evaluate(expr->m_right);
+}
+
+std::any
+Interpreter::visitSetExpr(std::shared_ptr<Set> expr)
+{
+	std::shared_ptr<Expr> obj = evaluate(expr->m_object);
+	std::shared_ptr<LoxInstance> inst = std::dynamic_pointer_cast<LoxInstance>(obj);
+	if (!inst)
+	{
+		throw RuntimeError(expr->m_name, L"Only instances have fields.");
+	}
+
+	std::shared_ptr<Expr> value = evaluate(expr->m_value);
+	inst->set(expr->m_name, value);
+	return value;
 }
 
 std::any

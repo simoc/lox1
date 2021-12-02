@@ -40,6 +40,14 @@ AstPrinter::visitCallExpr(std::shared_ptr<Call> expr)
 }
 
 std::any
+AstPrinter::visitGetExpr(std::shared_ptr<Get> expr)
+{
+	std::wostringstream os;
+	os << "assign " << expr->m_name->lexeme;
+	return parenthesize(os.str(), expr->m_object);
+}
+
+std::any
 AstPrinter::visitGroupingExpr(std::shared_ptr<Grouping> expr)
 {
 	std::wstring grouping(L"group");
@@ -70,6 +78,15 @@ std::any
 AstPrinter::visitLogicalExpr(std::shared_ptr<Logical> expr)
 {
 	return parenthesize(expr->m_operatorX->lexeme, expr->m_left, expr->m_right);
+}
+
+std::any
+AstPrinter::visitSetExpr(std::shared_ptr<Set> expr)
+{
+	std::wostringstream os;
+	os << std::any_cast<std::wstring>(parenthesize(L"set", expr->m_object));
+	os << std::any_cast<std::wstring>(parenthesize(expr->m_name->lexeme, expr->m_value));
+	return os.str();
 }
 
 std::any

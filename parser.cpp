@@ -286,8 +286,16 @@ Parser::assignment()
 		try
 		{
 			auto variable = std::dynamic_pointer_cast<Variable>(expr);
-			std::shared_ptr<Token> name = variable->m_name;
-			return std::make_shared<Assign>(name, value);
+			if (variable)
+			{
+				std::shared_ptr<Token> name = variable->m_name;
+				return std::make_shared<Assign>(name, value);
+			}
+			auto get = std::dynamic_pointer_cast<Get>(expr);
+			if (get)
+			{
+				return std::make_shared<Set>(get->m_object, get->m_name, value);
+			}
 		}
 		catch (const std::bad_any_cast &e)
 		{
@@ -429,6 +437,12 @@ Parser::call()
 		if (match(LEFT_PAREN))
 		{
 			expr = finishCall(expr);
+		}
+		else if (match(DOT))
+		{
+			std::shared_ptr<Token> name = consume(IDENTIFIER,
+				L"Expect property name after '.'.");
+			expr = std::make_shared<Get>(expr, name);
 		}
 		else
 		{

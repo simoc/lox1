@@ -34,6 +34,13 @@ Resolver::visitCallExpr(std::shared_ptr<Call> expr)
 }
 
 std::any
+Resolver::visitGetExpr(std::shared_ptr<Get> expr)
+{
+	resolve(expr->m_object);
+	return nullptr;
+}
+
+std::any
 Resolver::visitGroupingExpr(std::shared_ptr<Grouping> expr)
 {
 	resolve(expr->m_expression);
@@ -69,6 +76,14 @@ Resolver::visitLogicalExpr(std::shared_ptr<Logical> expr)
 {
 	resolve(expr->m_left);
 	resolve(expr->m_right);
+	return nullptr;
+}
+
+std::any
+Resolver::visitSetExpr(std::shared_ptr<Set> expr)
+{
+	resolve(expr->m_value);
+	resolve(expr->m_object);
 	return nullptr;
 }
 

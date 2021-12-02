@@ -16,6 +16,12 @@ public:
 
 	std::size_t arity();
 
+	std::shared_ptr<Expr> get(std::shared_ptr<Token> name);
+
+	void set(std::shared_ptr<Token> name, std::shared_ptr<Expr> value);
+
 private:
 	std::shared_ptr<LoxClass> klass;
+
+	std::map<std::wstring, std::shared_ptr<Expr>> fields;
 };

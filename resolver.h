@@ -35,6 +35,8 @@ public:
 
 	std::any visitCallExpr(std::shared_ptr<Call> expr);
 
+	std::any visitGetExpr(std::shared_ptr<Get> expr);
+
 	std::any visitGroupingExpr(std::shared_ptr<Grouping> expr);
 
 	std::any visitDoubleLiteralExpr(std::shared_ptr<DoubleLiteral> expr);
@@ -46,6 +48,8 @@ public:
 	std::any visitNilLiteralExpr(std::shared_ptr<NilLiteral> expr);
 
 	std::any visitLogicalExpr(std::shared_ptr<Logical> expr);
+
+	std::any visitSetExpr(std::shared_ptr<Set> expr);
 
 	std::any visitUnaryExpr(std::shared_ptr<Unary> expr);
 
