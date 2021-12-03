@@ -33,6 +33,12 @@ LoxInstance::get(std::shared_ptr<Token> name)
 		return it->second;
 	}
 
+	auto method = klass->findMethod(name->lexeme);
+	if (method)
+	{
+		return method;
+	}
+
 	throw RuntimeError(name, L"Undefined property '" + name->lexeme + L"'.");
 }
 

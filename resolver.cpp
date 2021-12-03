@@ -176,6 +176,12 @@ Resolver::visitClassStmt(std::shared_ptr<Class> stmt)
 {
 	declare(stmt->m_name);
 	define(stmt->m_name);
+
+	for (std::shared_ptr<Function> method : stmt->m_methods)
+	{
+		FunctionType declaration = FunctionType::METHOD;
+		resolveFunction(method, declaration);
+	}
 	return nullptr;
 }
 

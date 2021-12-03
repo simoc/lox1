@@ -45,7 +45,14 @@ std::any
 Interpreter::visitClassStmt(std::shared_ptr<Class> stmt)
 {
 	environment->define(stmt->m_name->lexeme, std::make_shared<NilLiteral>());
-	std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->m_name->lexeme);
+
+	std::map<std::wstring, std::shared_ptr<LoxFunction>> methods;
+	for (std::shared_ptr<Function> method : stmt->m_methods)
+	{
+		std::shared_ptr<LoxFunction> func = std::make_shared<LoxFunction>(method, environment);
+		methods.insert_or_assign(method->m_name->lexeme, func);
+	}
+	std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->m_name->lexeme, methods);
 	environment->assign(stmt->m_name, klass);
 	return std::make_shared<NilLiteral>();
 }
