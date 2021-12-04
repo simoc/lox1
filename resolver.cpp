@@ -198,6 +198,17 @@ Resolver::visitClassStmt(std::shared_ptr<Class> stmt)
 	declare(stmt->m_name);
 	define(stmt->m_name);
 
+	if (stmt->m_superclass &&
+		stmt->m_name->lexeme == stmt->m_superclass->m_name->lexeme)
+	{
+		Lox::error(stmt->m_superclass->m_name, L"A class can't inherit from itself.");
+	}
+
+	if (stmt->m_superclass)
+	{
+		resolve(stmt->m_superclass);
+	}
+
 	beginScope();
 	scopes.back().insert_or_assign(L"this", true);
 

@@ -18,7 +18,9 @@ class LoxFunction;
 class LoxClass : public LoxCallable, public std::enable_shared_from_this<LoxClass>
 {
 public:
-	LoxClass(const std::wstring &_name, const std::map<std::wstring, std::shared_ptr<LoxFunction>> &_methods);
+	LoxClass(const std::wstring &_name,
+		std::shared_ptr<LoxClass> _superclass,
+		const std::map<std::wstring, std::shared_ptr<LoxFunction>> &_methods);
 
 	std::wstring toString() const;
 
@@ -32,6 +34,8 @@ public:
 
 private:
 	std::wstring name;
+
+	std::shared_ptr<LoxClass> superclass;
 
 	std::map<std::wstring, std::shared_ptr<LoxFunction>> methods;
 };

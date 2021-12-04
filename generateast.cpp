@@ -259,7 +259,7 @@ main(int argc, char *argv[])
 	const std::vector<std::wstring> statementTypes =
 	{
 		L"Block      : std::vector<std::shared_ptr<Stmt>> statements",
-		L"Class      : std::shared_ptr<Token> name, std::vector<std::shared_ptr<Function>> methods",
+		L"Class      : std::shared_ptr<Token> name, std::shared_ptr<Variable> superclass, std::vector<std::shared_ptr<Function>> methods",
 		L"Expression : std::shared_ptr<Expr> expression",
 		L"Function   : std::shared_ptr<Token> name, std::vector<std::shared_ptr<Token>> params, std::vector<std::shared_ptr<Stmt>> body",
 		L"If         : std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> thenBranch, std::shared_ptr<Stmt> elseBranch",

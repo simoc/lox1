@@ -1,8 +1,11 @@
 #include "loxclass.h"
 #include "loxinstance.h"
 
-LoxClass::LoxClass(const std::wstring &_name, const std::map<std::wstring, std::shared_ptr<LoxFunction>> &_methods) :
+LoxClass::LoxClass(const std::wstring &_name,
+	std::shared_ptr<LoxClass> _superclass,
+	const std::map<std::wstring, std::shared_ptr<LoxFunction>> &_methods) :
 	name(_name),
+	superclass(_superclass),
 	methods(_methods)
 {
 }
@@ -53,6 +56,11 @@ LoxClass::findMethod(const std::wstring &name)
 	if (it != methods.end())
 	{
 		return it->second;
+	}
+
+	if (superclass)
+	{
+		return superclass->findMethod(name);
 	}
 
 	std::shared_ptr<LoxFunction> empty;

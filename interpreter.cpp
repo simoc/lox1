@@ -44,6 +44,17 @@ Interpreter::visitBlockStmt(std::shared_ptr<Block> stmt)
 std::any
 Interpreter::visitClassStmt(std::shared_ptr<Class> stmt)
 {
+	std::shared_ptr<LoxClass> superclass;
+	if (stmt->m_superclass)
+	{
+		auto expr = evaluate(stmt->m_superclass);
+		superclass = std::dynamic_pointer_cast<LoxClass>(expr);
+		if (!superclass)
+		{
+			throw RuntimeError(stmt->m_superclass->m_name,
+				L"Superclass must be a class.");
+		}
+	}
 	environment->define(stmt->m_name->lexeme, std::make_shared<NilLiteral>());
 
 	std::map<std::wstring, std::shared_ptr<LoxFunction>> methods;
@@ -54,7 +65,8 @@ Interpreter::visitClassStmt(std::shared_ptr<Class> stmt)
 			environment, isInitializer);
 		methods.insert_or_assign(method->m_name->lexeme, func);
 	}
-	std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->m_name->lexeme, methods);
+	std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->m_name->lexeme,
+		superclass, methods);
 	environment->assign(stmt->m_name, klass);
 	return std::make_shared<NilLiteral>();
 }
