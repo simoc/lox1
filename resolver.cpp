@@ -164,6 +164,10 @@ Resolver::visitReturnStmt(std::shared_ptr<Return> stmt)
 
 	if (stmt->m_value)
 	{
+		if (currentFunction == FunctionType::INITIALIZER)
+		{
+			Lox::error(stmt->m_keyword, L"Can't return a value from an initializer.");
+		}
 		resolve(stmt->m_value);
 	}
 	return nullptr;
@@ -200,6 +204,10 @@ Resolver::visitClassStmt(std::shared_ptr<Class> stmt)
 	for (std::shared_ptr<Function> method : stmt->m_methods)
 	{
 		FunctionType declaration = FunctionType::METHOD;
+		if (method->m_name->lexeme == std::wstring(L"init"))
+		{
+			declaration = FunctionType::INITIALIZER;
+		}
 		resolveFunction(method, declaration);
 	}
 

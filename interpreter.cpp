@@ -49,7 +49,9 @@ Interpreter::visitClassStmt(std::shared_ptr<Class> stmt)
 	std::map<std::wstring, std::shared_ptr<LoxFunction>> methods;
 	for (std::shared_ptr<Function> method : stmt->m_methods)
 	{
-		std::shared_ptr<LoxFunction> func = std::make_shared<LoxFunction>(method, environment);
+		bool isInitializer = (method->m_name->lexeme == std::wstring(L"this"));
+		std::shared_ptr<LoxFunction> func = std::make_shared<LoxFunction>(method,
+			environment, isInitializer);
 		methods.insert_or_assign(method->m_name->lexeme, func);
 	}
 	std::shared_ptr<LoxClass> klass = std::make_shared<LoxClass>(stmt->m_name->lexeme, methods);
@@ -316,7 +318,7 @@ Interpreter::lookUpVariable(std::shared_ptr<Token> name, std::shared_ptr<Expr> e
 	if (it != locals.end())
 	{
 		int distance = it->second;
-		return environment->getAt(distance, name);
+		return environment->getAt(distance, name->lexeme);
 	}
 	else
 	{
@@ -327,7 +329,7 @@ Interpreter::lookUpVariable(std::shared_ptr<Token> name, std::shared_ptr<Expr> e
 std::any
 Interpreter::visitFunctionStmt(std::shared_ptr<Function> stmt)
 {
-	std::shared_ptr<LoxFunction> func = std::make_shared<LoxFunction>(stmt, environment);
+	std::shared_ptr<LoxFunction> func = std::make_shared<LoxFunction>(stmt, environment, false);
 	environment->define(stmt->m_name->lexeme, func);
 	return std::make_shared<NilLiteral>();
 }

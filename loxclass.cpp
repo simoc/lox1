@@ -22,13 +22,27 @@ LoxClass::accept(ExprVisitor *visitor)
 std::size_t
 LoxClass::arity()
 {
-	return 0;
+	std::shared_ptr<LoxFunction> initializer = findMethod(L"init");
+	if (initializer)
+	{
+		return initializer->arity();
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 std::shared_ptr<Expr>
 LoxClass::call(Interpreter *interpreter, std::vector<std::shared_ptr<Expr>> arguments)
 {
 	std::shared_ptr<LoxInstance> instance = std::make_shared<LoxInstance>(shared_from_this());
+
+	std::shared_ptr<LoxFunction> initializer = findMethod(L"init");
+	if (initializer)
+	{
+		initializer->bind(instance)->call(interpreter, arguments);
+	}
 	return instance;
 }
 

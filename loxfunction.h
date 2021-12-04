@@ -14,7 +14,8 @@ class LoxInstance;
 class LoxFunction : public LoxCallable
 {
 public:
-	LoxFunction(std::shared_ptr<Function> _declaration, std::shared_ptr<Environment> _closure);
+	LoxFunction(std::shared_ptr<Function> _declaration, std::shared_ptr<Environment> _closure,
+		bool _isInitializer);
 
 	std::size_t arity();
 
@@ -30,4 +31,6 @@ private:
 	std::shared_ptr<Function> declaration;
 
 	std::shared_ptr<Environment> closure;
+
+	bool isInitializer;
 };

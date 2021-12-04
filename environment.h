@@ -18,7 +18,7 @@ public:
 
 	std::shared_ptr<Expr> get(std::shared_ptr<Token> name);
 
-	std::shared_ptr<Expr> getAt(int distance, std::shared_ptr<Token> name);
+	std::shared_ptr<Expr> getAt(int distance, const std::wstring &name);
 
 	void assign(std::shared_ptr<Token> name, std::shared_ptr<Expr> value);
 

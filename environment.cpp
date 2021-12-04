@@ -35,9 +35,10 @@ Environment::get(std::shared_ptr<Token> name)
 }
 
 std::shared_ptr<Expr>
-Environment::getAt(int distance, std::shared_ptr<Token> name)
+Environment::getAt(int distance, const std::wstring &name)
 {
-	return ancestor(distance)->get(name);
+	std::shared_ptr<Environment> env = ancestor(distance);
+	return env->values.find(name)->second;
 }
 
 std::shared_ptr<Environment>
