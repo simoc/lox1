@@ -2,7 +2,13 @@
 
 #include <memory>
 
+/*
+ * Solve circular dependency between classes LoxClass, LoxFunction and LoxInstance.
+ */
+class LoxInstance;
+
 #include "loxcallable.h"
+#include "loxinstance.h"
 #include "environment.h"
 
 class LoxFunction : public LoxCallable
@@ -17,6 +23,9 @@ public:
 	std::any accept(ExprVisitor *visitor);
 
 	std::wstring toString();
+
+	std::shared_ptr<LoxFunction> bind(std::shared_ptr<LoxInstance> inst);
+
 private:
 	std::shared_ptr<Function> declaration;
 

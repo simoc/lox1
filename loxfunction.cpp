@@ -43,3 +43,11 @@ LoxFunction::toString()
 {
 	return L"<fn " + declaration->m_name->lexeme + L">";
 }
+
+std::shared_ptr<LoxFunction>
+LoxFunction::bind(std::shared_ptr<LoxInstance> inst)
+{
+	std::shared_ptr<Environment> environment = std::make_shared<Environment>(closure);
+	environment->define(L"this", inst);
+	return std::make_shared<LoxFunction>(declaration, environment);
+}

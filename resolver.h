@@ -18,6 +18,16 @@ enum class FunctionType
 	METHOD
 };
 
+/*
+ * Indicates whether resolver is currently in a class, or not.
+ * From 12.6, This.
+ */
+enum class ClassType
+{
+	NONE,
+	CLASS
+};
+
 /**
  * Resolves lox programs, from Chapter 11.
  */
@@ -52,6 +62,8 @@ public:
 
 	std::any visitSetExpr(std::shared_ptr<Set> expr);
 
+	std::any visitThisExpr(std::shared_ptr<This> expr);
+
 	std::any visitUnaryExpr(std::shared_ptr<Unary> expr);
 
 	std::any visitVariableExpr(std::shared_ptr<Variable> expr);
@@ -76,6 +88,7 @@ private:
 	Interpreter &interpreter;
 	std::vector<std::map<std::wstring, bool>> scopes;
 	FunctionType currentFunction = FunctionType::NONE;
+	static ClassType currentClass;
 
 	void resolve(std::shared_ptr<Stmt> statement);
 

@@ -33,6 +33,8 @@ public:
 
 	std::any visitSetExpr(std::shared_ptr<Set> expr);
 
+	std::any visitThisExpr(std::shared_ptr<This> expr);
+
 	std::any visitUnaryExpr(std::shared_ptr<Unary> expr);
 
 	std::any visitVariableExpr(std::shared_ptr<Variable> expr);

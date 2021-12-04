@@ -275,6 +275,12 @@ Interpreter::visitSetExpr(std::shared_ptr<Set> expr)
 }
 
 std::any
+Interpreter::visitThisExpr(std::shared_ptr<This> expr)
+{
+	return lookUpVariable(expr->m_keyword, expr);
+}
+
+std::any
 Interpreter::visitUnaryExpr(std::shared_ptr<Unary> expr)
 {
 	std::shared_ptr<Expr> right = evaluate(expr->m_right);

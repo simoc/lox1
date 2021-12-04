@@ -497,6 +497,10 @@ Parser::primary()
 	{
 		return std::make_shared<DoubleLiteral>(previous()->double_literal);
 	}
+	if (match(THIS))
+	{
+		return std::make_shared<This>(previous());
+	}
 	if (match(IDENTIFIER))
 	{
 		return std::make_shared<Variable>(previous());

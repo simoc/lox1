@@ -90,6 +90,12 @@ AstPrinter::visitSetExpr(std::shared_ptr<Set> expr)
 }
 
 std::any
+AstPrinter::visitThisExpr(std::shared_ptr<This> expr)
+{
+	return expr->m_keyword->lexeme;
+}
+
+std::any
 AstPrinter::visitNilLiteralExpr(std::shared_ptr<NilLiteral> expr)
 {
 	return std::wstring(L"nil");

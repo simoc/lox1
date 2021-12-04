@@ -5,6 +5,11 @@
 #include <vector>
 #include <map>
 
+/*
+ * Solve circular dependency between classes LoxClass, LoxFunction and LoxInstance.
+ */
+class LoxFunction;
+
 #include "expr.h"
 #include "loxcallable.h"
 #include "interpreter.h"

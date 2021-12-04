@@ -1,6 +1,8 @@
 #include "resolver.h"
 #include "lox.h"
 
+ClassType Resolver::currentClass = ClassType::NONE;
+
 Resolver::Resolver(Interpreter &_interpreter) :
 	interpreter(_interpreter)
 {
@@ -84,6 +86,18 @@ Resolver::visitSetExpr(std::shared_ptr<Set> expr)
 {
 	resolve(expr->m_value);
 	resolve(expr->m_object);
+	return nullptr;
+}
+
+std::any
+Resolver::visitThisExpr(std::shared_ptr<This> expr)
+{
+	if (currentClass == ClassType::NONE)
+	{
+		Lox::error(expr->m_keyword, L"Can't use 'this' outside of a class.");
+		return nullptr;
+	}
+	resolveLocal(expr, expr->m_keyword);
 	return nullptr;
 }
 
@@ -174,14 +188,24 @@ Resolver::visitBlockStmt(std::shared_ptr<Block> stmt)
 std::any
 Resolver::visitClassStmt(std::shared_ptr<Class> stmt)
 {
+	ClassType enclosingClass = currentClass;
+	currentClass = ClassType::CLASS;
+
 	declare(stmt->m_name);
 	define(stmt->m_name);
+
+	beginScope();
+	scopes.back().insert_or_assign(L"this", true);
 
 	for (std::shared_ptr<Function> method : stmt->m_methods)
 	{
 		FunctionType declaration = FunctionType::METHOD;
 		resolveFunction(method, declaration);
 	}
+
+	endScope();
+
+	currentClass = enclosingClass;
 	return nullptr;
 }
 

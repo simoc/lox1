@@ -1,11 +1,20 @@
 #pragma once
 
+#include <memory>
+
+/*
+ * Solve circular dependency between classes LoxClass, LoxFunction and LoxInstance.
+ */
+class LoxClass;
+
+#include "token.h"
+#include "expr.h"
 #include "loxclass.h"
 
 /**
  * An instance of a class, from Chapter 12.3.
  */
-class LoxInstance : public Expr
+class LoxInstance : public Expr, public std::enable_shared_from_this<LoxInstance>
 {
 public:
 	LoxInstance(std::shared_ptr<LoxClass> _klass);
