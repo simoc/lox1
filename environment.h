@@ -24,6 +24,8 @@ public:
 
 	void assignAt(int distance, std::shared_ptr<Token> name, std::shared_ptr<Expr> value);
 
+	std::shared_ptr<Environment> getEnclosing();
+
 private:
 	std::map<std::wstring, std::shared_ptr<Expr>> values;
 	std::shared_ptr<Environment> enclosing;

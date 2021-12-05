@@ -250,6 +250,7 @@ main(int argc, char *argv[])
 		L"NilLiteral  :",
 		L"Logical  : std::shared_ptr<Expr> left, std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
 		L"Set      : std::shared_ptr<Expr> object, std::shared_ptr<Token> name, std::shared_ptr<Expr> value",
+		L"Super    : std::shared_ptr<Token> keyword, std::shared_ptr<Token> method",
 		L"This     : std::shared_ptr<Token> keyword",
 		L"Unary    : std::shared_ptr<Token> operatorX, std::shared_ptr<Expr> right",
 		L"Variable : std::shared_ptr<Token> name"

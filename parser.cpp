@@ -504,6 +504,14 @@ Parser::primary()
 	{
 		return std::make_shared<DoubleLiteral>(previous()->double_literal);
 	}
+	if (match(SUPER))
+	{
+		std::shared_ptr<Token> keyword = previous();
+		consume(DOT, L"Expect '.' after 'super'.");
+		std::shared_ptr<Token> method = consume(IDENTIFIER,
+			L"Expect superclass method name.");
+		return std::make_shared<Super>(keyword, method);
+	}
 	if (match(THIS))
 	{
 		return std::make_shared<This>(previous());

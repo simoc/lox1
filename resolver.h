@@ -26,7 +26,8 @@ enum class FunctionType
 enum class ClassType
 {
 	NONE,
-	CLASS
+	CLASS,
+	SUBCLASS
 };
 
 /**
@@ -62,6 +63,8 @@ public:
 	std::any visitLogicalExpr(std::shared_ptr<Logical> expr);
 
 	std::any visitSetExpr(std::shared_ptr<Set> expr);
+
+	std::any visitSuperExpr(std::shared_ptr<Super> expr);
 
 	std::any visitThisExpr(std::shared_ptr<This> expr);
 

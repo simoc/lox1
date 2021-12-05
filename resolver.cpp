@@ -90,6 +90,22 @@ Resolver::visitSetExpr(std::shared_ptr<Set> expr)
 }
 
 std::any
+Resolver::visitSuperExpr(std::shared_ptr<Super> expr)
+{
+	if (currentClass == ClassType::NONE)
+	{
+		Lox::error(expr->m_keyword, L"Can't use 'super' outside of a class.");
+	}
+	else if (currentClass != ClassType::SUBCLASS)
+	{
+		Lox::error(expr->m_keyword, L"Can't use 'super' in a class with no superclass.");
+	}
+
+	resolveLocal(expr, expr->m_keyword);
+	return nullptr;
+}
+
+std::any
 Resolver::visitThisExpr(std::shared_ptr<This> expr)
 {
 	if (currentClass == ClassType::NONE)
@@ -206,7 +222,14 @@ Resolver::visitClassStmt(std::shared_ptr<Class> stmt)
 
 	if (stmt->m_superclass)
 	{
+		currentClass = ClassType::SUBCLASS;
 		resolve(stmt->m_superclass);
+	}
+
+	if (stmt->m_superclass)
+	{
+		beginScope();
+		scopes.back().insert_or_assign(L"super", true);
 	}
 
 	beginScope();
@@ -223,6 +246,11 @@ Resolver::visitClassStmt(std::shared_ptr<Class> stmt)
 	}
 
 	endScope();
+
+	if (stmt->m_superclass)
+	{
+		endScope();
+	}
 
 	currentClass = enclosingClass;
 	return nullptr;

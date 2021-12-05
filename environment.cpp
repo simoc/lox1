@@ -82,3 +82,8 @@ Environment::assignAt(int distance, std::shared_ptr<Token> name, std::shared_ptr
 	ancestor(distance)->values.insert_or_assign(name->lexeme, value);
 }
 
+std::shared_ptr<Environment>
+Environment::getEnclosing()
+{
+	return enclosing;
+}

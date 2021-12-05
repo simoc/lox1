@@ -89,6 +89,13 @@ AstPrinter::visitSetExpr(std::shared_ptr<Set> expr)
 	return os.str();
 }
 
+
+std::any
+AstPrinter::visitSuperExpr(std::shared_ptr<Super> expr)
+{
+	return expr->m_keyword->lexeme + L"." + expr->m_method->lexeme;
+}
+
 std::any
 AstPrinter::visitThisExpr(std::shared_ptr<This> expr)
 {
