@@ -203,6 +203,10 @@ Interpreter::visitCallExpr(std::shared_ptr<Call> expr)
 	try
 	{
 		func = std::dynamic_pointer_cast<LoxCallable>(callee);
+		if (!func)
+		{
+			throw RuntimeError(expr->m_paren, L"Can only call functions and classes.");
+		}
 	}
 	catch (const std::bad_any_cast &e)
 	{
