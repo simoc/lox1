@@ -446,8 +446,16 @@ Interpreter::castToExpr(std::any value)
 				}
 				catch (const std::bad_any_cast &e)
 				{
-					std::shared_ptr<Expr> expr = std::any_cast<std::shared_ptr<Expr>>(value);
-					return expr;
+					try
+					{
+						std::shared_ptr<Expr> expr = std::any_cast<std::shared_ptr<Expr>>(value);
+						return expr;
+					}
+					catch (const std::bad_any_cast &e)
+					{
+						std::shared_ptr<LoxFunction> func = std::any_cast<std::shared_ptr<LoxFunction>>(value);
+						return func;
+					}
 				}
 			}
 		}
