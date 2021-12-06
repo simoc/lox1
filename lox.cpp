@@ -78,6 +78,9 @@ Lox::runFile(char *path)
 	std::wifstream f(path);
 	if (f)
 	{
+		// Assume UTF-8, anything more complex is difficult to handle
+		f.imbue(std::locale("C.UTF-8"));
+
 		std::wstring bytes;
 		const int bufSize = 512;
 		wchar_t buf[bufSize];
