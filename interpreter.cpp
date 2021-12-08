@@ -5,6 +5,7 @@
 #include "clockfunction.h"
 #include "loxfunction.h"
 #include "returnerror.h"
+#include "runtimeerror.h"
 #include "loxclass.h"
 #include "loxinstance.h"
 
@@ -99,6 +100,11 @@ Interpreter::executeBlock(std::vector<std::shared_ptr<Stmt>> statements, std::sh
 		environment = previous;
 	}
 	catch (const ReturnError &e)
+	{
+		environment = previous;
+		throw e;
+	}
+	catch (const RuntimeError &e)
 	{
 		environment = previous;
 		throw e;
