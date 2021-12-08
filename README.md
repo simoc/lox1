@@ -1,3 +1,5 @@
+![main workflow](https://github.com/simoc/lox1/actions/workflows/main.yml/badge.svg)
+
 # lox1
 
 Lox scripting language interpreter from Chapters 1-13 of the http://www.craftinginterpreters.com web site and book.
