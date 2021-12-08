@@ -13,3 +13,15 @@ have been created.
 Build the interpreter using the `Makefile` and `gcc` with the command:
 
     make all
+    
+## Usage
+
+```
+$ ./lox1
+> print "hello" + "world!";
+helloworld!
+> fun sum(a, b, c) { return a + b + c; }
+> print sum(1, 4, 8);
+13
+>
+```
