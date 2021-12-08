@@ -8,6 +8,8 @@ However, the widespread use of `java.lang.Object` to hold basic data types canno
 and the additional C++ classes `StringLiteral`, `DoubleLiteral`, `BooleanLiteral` and `NilLiteral`
 have been created.
 
+As garbage collection is not available in C++, `std::shared_ptr` is used to ensure that memory used by the interpreter is freed after use.
+
 ## Compiling
 
 Build the interpreter using the `Makefile` and `gcc` with the command:
